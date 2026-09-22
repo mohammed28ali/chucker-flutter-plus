@@ -1,39 +1,87 @@
-<!--
-This README describes the package. If you publish this package to pub.dev,
-this README's contents appear on the landing page for your package.
+# chucker_flutter_plus
 
-For information about how to write a good package README, see the guide for
-[writing package pages](https://dart.dev/tools/pub/writing-package-pages).
+An in-app HTTP inspector for Flutter. It captures requests made through Dio or
+the `http` package, persists a bounded history locally, and exposes a Material
+inspection screen.
 
-For general information about developing packages, see the Dart guide for
-[creating packages](https://dart.dev/guides/libraries/create-packages)
-and the Flutter guide for
-[developing packages and plugins](https://flutter.dev/to/develop-packages).
--->
+## Installation
 
-TODO: Put a short description of the package here that helps potential users
-know whether this package might be useful for them.
+```yaml
+dependencies:
+  chucker_flutter_plus: ^0.0.1
+```
 
-## Features
-
-TODO: List what your package can do. Maybe include images, gifs, or videos.
-
-## Getting started
-
-TODO: List prerequisites and provide or point to information on how to
-start using the package.
+Run `flutter pub get` afterward.
 
 ## Usage
 
-TODO: Include short and useful examples for package users. Add longer examples
-to `/example` folder.
+Attach the navigator key, then add a supported adapter to your client:
 
 ```dart
-const like = 'sample';
+import 'package:chucker_flutter_plus/chucker_flutter_plus.dart';
+import 'package:dio/dio.dart';
+
+final dio = Dio()..interceptors.add(ChuckerDioInterceptor());
+
+MaterialApp(
+  navigatorKey: ChuckerFlutter.navigatorKey,
+  home: const MyAppHome(),
+);
 ```
 
-## Additional information
+For `package:http`, wrap the client instead:
 
-TODO: Tell users more about the package: where to find more information, how to
-contribute to the package, how to file issues, what response they can expect
-from the package authors, and more.
+```dart
+final client = ChuckerHttpClient(http.Client());
+```
+
+Open the inspector from any debug UI location:
+
+```dart
+ChuckerFlutter.button()
+// or
+await ChuckerFlutter.showChuckerScreen();
+```
+
+Capture is enabled only in debug builds by default. Calling
+`ChuckerFlutter.configure(enableOnRelease: true)` enables it in release builds;
+review and redact sensitive traffic before doing so.
+
+## Public API
+
+- `ChuckerDioInterceptor` — records Dio responses and failures.
+- `ChuckerHttpClient` — records `package:http` requests and failures.
+- `ChuckerFlutter` — navigator integration, UI launch, and configuration.
+- `NetworkTransaction` — immutable representation of a captured transaction.
+
+## Architecture
+
+```text
+lib/
+├── chucker_flutter_plus.dart
+└── src/
+    ├── config/dependency_injection/ # Composition root
+    └── features/network_inspector/
+        ├── domain/                  # Rules and repository contract
+        ├── data/                    # SharedPreferences implementation
+        ├── infrastructure/          # Dio and http adapters
+        └── presentation/            # Inspector UI and host integration
+```
+
+```text
+Presentation → Domain ← Data
+      ↑                    ↑
+   Flutter UI       SharedPreferences
+      ↑
+Dio / http adapters
+```
+
+The domain layer is independent of Flutter, Dio, HTTP, and persistence.
+
+## Development
+
+```bash
+dart format .
+flutter analyze
+flutter test
+```

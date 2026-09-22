@@ -1,15 +1,17 @@
 name: chucker_flutter_plus
-description: "A new Flutter package project."
-version: 0.0.1
-homepage:
+description: An in-app HTTP inspector for Flutter applications, built with Clean Architecture.
+version: 0.1.0
 
 environment:
   sdk: ^3.13.2
   flutter: ">=1.17.0"
 
 dependencies:
+  dio: ^5.9.0
   flutter:
     sdk: flutter
+  http: ^1.6.0
+  shared_preferences: ^2.5.3
 
 dev_dependencies:
   flutter_test:
