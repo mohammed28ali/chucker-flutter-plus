@@ -6,8 +6,8 @@ import '../domain/entities/network_transaction.dart';
 import 'pages/network_inspector_page.dart';
 
 /// Configures and opens the in-app network inspector.
-class ChuckerFlutter {
-  ChuckerFlutter._();
+class ChuckerFlutterPlus {
+  ChuckerFlutterPlus._();
 
   /// Attach this key to the host application's root [MaterialApp].
   static final navigatorKey = GlobalKey<NavigatorState>();
@@ -43,7 +43,7 @@ class ChuckerFlutter {
     final navigator = navigatorKey.currentState;
     if (navigator == null) {
       throw StateError(
-        'Attach ChuckerFlutter.navigatorKey to the root MaterialApp before opening the inspector.',
+        'Attach ChuckerFlutterPlus.navigatorKey to the root MaterialApp before opening the inspector.',
       );
     }
     await navigator.push<void>(

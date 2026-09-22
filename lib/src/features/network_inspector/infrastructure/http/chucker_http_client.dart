@@ -17,7 +17,7 @@ class ChuckerHttpClient extends http.BaseClient {
     try {
       final response = await _client.send(request);
       final bytes = await response.stream.toBytes();
-      await ChuckerFlutter.record(
+      await ChuckerFlutterPlus.record(
         NetworkTransaction(
           id: '${request.hashCode}-${startedAt.microsecondsSinceEpoch}',
           startedAt: startedAt,
@@ -42,7 +42,7 @@ class ChuckerHttpClient extends http.BaseClient {
         reasonPhrase: response.reasonPhrase,
       );
     } catch (error) {
-      await ChuckerFlutter.record(
+      await ChuckerFlutterPlus.record(
         NetworkTransaction(
           id: '${request.hashCode}-${startedAt.microsecondsSinceEpoch}',
           startedAt: startedAt,

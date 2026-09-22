@@ -70,7 +70,7 @@ class ChuckerDioInterceptor extends Interceptor {
 
   void _record(NetworkTransaction transaction) {
     // Dio's interceptor API is synchronous; persistence must not delay a call.
-    ChuckerFlutter.record(transaction).ignore();
+    ChuckerFlutterPlus.record(transaction).ignore();
   }
 
   DateTime _startedAt(RequestOptions request) =>

@@ -24,7 +24,7 @@ import 'package:dio/dio.dart';
 final dio = Dio()..interceptors.add(ChuckerDioInterceptor());
 
 MaterialApp(
-  navigatorKey: ChuckerFlutter.navigatorKey,
+  navigatorKey: ChuckerFlutterPlus.navigatorKey,
   home: const MyAppHome(),
 );
 ```
@@ -38,20 +38,20 @@ final client = ChuckerHttpClient(http.Client());
 Open the inspector from any debug UI location:
 
 ```dart
-ChuckerFlutter.button()
+ChuckerFlutterPlus.button()
 // or
-await ChuckerFlutter.showChuckerScreen();
+await ChuckerFlutterPlus.showChuckerScreen();
 ```
 
 Capture is enabled only in debug builds by default. Calling
-`ChuckerFlutter.configure(enableOnRelease: true)` enables it in release builds;
+`ChuckerFlutterPlus.configure(enableOnRelease: true)` enables it in release builds;
 review and redact sensitive traffic before doing so.
 
 ## Public API
 
 - `ChuckerDioInterceptor` — records Dio responses and failures.
 - `ChuckerHttpClient` — records `package:http` requests and failures.
-- `ChuckerFlutter` — navigator integration, UI launch, and configuration.
+- `ChuckerFlutterPlus` — navigator integration, UI launch, and configuration.
 - `NetworkTransaction` — immutable representation of a captured transaction.
 
 ## Architecture
