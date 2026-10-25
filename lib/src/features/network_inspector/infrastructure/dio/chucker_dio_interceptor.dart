@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 
 import '../../domain/entities/network_transaction.dart';
+import '../body_capture.dart';
 import '../../presentation/chucker_flutter.dart';
 
 /// A Dio interceptor that records responses and failures for inspection.
@@ -38,10 +39,20 @@ class ChuckerDioInterceptor extends Interceptor {
         method: request.method,
         uri: request.uri,
         statusCode: response.statusCode,
-        requestHeaders: _requestHeaders(request.headers),
-        responseHeaders: _headers(response.headers),
-        requestBody: request.data,
-        responseBody: response.data,
+        requestHeaders: ChuckerFlutterPlus.redactHeaders(
+          _requestHeaders(request.headers),
+        ),
+        responseHeaders: ChuckerFlutterPlus.redactHeaders(
+          _headers(response.headers),
+        ),
+        rawRequestBody: BodyCapture.raw(request.data),
+        rawResponseBody: BodyCapture.raw(response.data),
+        requestBodySize: BodyCapture.size(
+          request.data,
+          BodyCapture.raw(request.data),
+        ),
+        responseBodySize: _responseSize(response),
+        contentType: response.headers.value('content-type'),
       ),
     );
   }
@@ -57,13 +68,22 @@ class ChuckerDioInterceptor extends Interceptor {
         method: request.method,
         uri: request.uri,
         statusCode: response?.statusCode,
-        requestHeaders: _requestHeaders(request.headers),
+        requestHeaders: ChuckerFlutterPlus.redactHeaders(
+          _requestHeaders(request.headers),
+        ),
         responseHeaders: response == null
             ? const {}
-            : _headers(response.headers),
-        requestBody: request.data,
-        responseBody: response?.data,
+            : ChuckerFlutterPlus.redactHeaders(_headers(response.headers)),
+        rawRequestBody: BodyCapture.raw(request.data),
+        rawResponseBody: BodyCapture.raw(response?.data),
+        requestBodySize: BodyCapture.size(
+          request.data,
+          BodyCapture.raw(request.data),
+        ),
+        responseBodySize: response == null ? 0 : _responseSize(response),
+        contentType: response?.headers.value('content-type'),
         error: error.message ?? error.type.name,
+        stackTrace: error.stackTrace.toString(),
       ),
     );
   }
@@ -84,4 +104,12 @@ class ChuckerDioInterceptor extends Interceptor {
 
   Map<String, String> _requestHeaders(Map<String, dynamic> headers) =>
       headers.map((key, value) => MapEntry(key, value.toString()));
+
+  int _responseSize(Response<dynamic> response) {
+    final declared = int.tryParse(
+      response.headers.value('content-length') ?? '',
+    );
+    return declared ??
+        BodyCapture.size(response.data, BodyCapture.raw(response.data));
+  }
 }

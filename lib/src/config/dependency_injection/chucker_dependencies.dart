@@ -10,10 +10,14 @@ class ChuckerDependencies {
     required this.recordTransaction,
   });
 
-  factory ChuckerDependencies.create({int maximumEntries = 100}) {
+  factory ChuckerDependencies.create({
+    int maximumEntries = 100,
+    Duration? retention,
+  }) {
     final repository = NetworkTransactionRepositoryImpl(
       NetworkTransactionLocalDataSource(),
       maximumEntries: maximumEntries,
+      retention: retention,
     );
     return ChuckerDependencies(
       transactions: repository,

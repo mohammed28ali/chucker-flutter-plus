@@ -1,10 +1,8 @@
-import 'dart:convert';
-
 import '../../domain/entities/network_transaction.dart';
 
 /// JSON-safe representation used by the local data source.
 class NetworkTransactionModel extends NetworkTransaction {
-  const NetworkTransactionModel({
+  NetworkTransactionModel({
     required super.id,
     required super.startedAt,
     required super.completedAt,
@@ -13,9 +11,15 @@ class NetworkTransactionModel extends NetworkTransaction {
     required super.statusCode,
     required super.requestHeaders,
     required super.responseHeaders,
-    super.requestBody,
-    super.responseBody,
+    super.rawRequestBody,
+    super.rawResponseBody,
+    super.requestBodySize,
+    super.responseBodySize,
+    super.contentType,
+    super.imageWidth,
+    super.imageHeight,
     super.error,
+    super.stackTrace,
   });
 
   factory NetworkTransactionModel.fromEntity(NetworkTransaction transaction) =>
@@ -28,9 +32,15 @@ class NetworkTransactionModel extends NetworkTransaction {
         statusCode: transaction.statusCode,
         requestHeaders: transaction.requestHeaders,
         responseHeaders: transaction.responseHeaders,
-        requestBody: transaction.requestBody,
-        responseBody: transaction.responseBody,
+        rawRequestBody: transaction.rawRequestBody,
+        rawResponseBody: transaction.rawResponseBody,
+        requestBodySize: transaction.requestBodySize,
+        responseBodySize: transaction.responseBodySize,
+        contentType: transaction.contentType,
+        imageWidth: transaction.imageWidth,
+        imageHeight: transaction.imageHeight,
         error: transaction.error,
+        stackTrace: transaction.stackTrace,
       );
 
   factory NetworkTransactionModel.fromJson(Map<String, Object?> json) =>
@@ -43,9 +53,15 @@ class NetworkTransactionModel extends NetworkTransaction {
         statusCode: json['statusCode'] as int?,
         requestHeaders: _stringMap(json['requestHeaders']),
         responseHeaders: _stringMap(json['responseHeaders']),
-        requestBody: json['requestBody'],
-        responseBody: json['responseBody'],
+        rawRequestBody: json['rawRequestBody'] as String?,
+        rawResponseBody: json['rawResponseBody'] as String?,
+        requestBodySize: json['requestBodySize'] as int? ?? 0,
+        responseBodySize: json['responseBodySize'] as int? ?? 0,
+        contentType: json['contentType'] as String?,
+        imageWidth: json['imageWidth'] as int?,
+        imageHeight: json['imageHeight'] as int?,
         error: json['error'] as String?,
+        stackTrace: json['stackTrace'] as String?,
       );
 
   Map<String, Object?> toJson() => {
@@ -57,25 +73,19 @@ class NetworkTransactionModel extends NetworkTransaction {
     'statusCode': statusCode,
     'requestHeaders': requestHeaders,
     'responseHeaders': responseHeaders,
-    'requestBody': _jsonValue(requestBody),
-    'responseBody': _jsonValue(responseBody),
+    'rawRequestBody': rawRequestBody,
+    'rawResponseBody': rawResponseBody,
+    'requestBodySize': requestBodySize,
+    'responseBodySize': responseBodySize,
+    'contentType': contentType,
+    'imageWidth': imageWidth,
+    'imageHeight': imageHeight,
     'error': error,
+    'stackTrace': stackTrace,
   };
 
   static Map<String, String> _stringMap(Object? value) =>
       (value as Map<Object?, Object?>? ?? const {}).map(
         (key, entry) => MapEntry('$key', '$entry'),
       );
-
-  static Object? _jsonValue(Object? value) {
-    if (value == null || value is num || value is bool || value is String) {
-      return value;
-    }
-    try {
-      jsonEncode(value);
-      return value;
-    } on JsonUnsupportedObjectError {
-      return value.toString();
-    }
-  }
 }

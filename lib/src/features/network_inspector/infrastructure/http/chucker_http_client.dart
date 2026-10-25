@@ -1,8 +1,7 @@
-import 'dart:convert';
-
 import 'package:http/http.dart' as http;
 
 import '../../domain/entities/network_transaction.dart';
+import '../body_capture.dart';
 import '../../presentation/chucker_flutter.dart';
 
 /// An [http.BaseClient] wrapper that records each completed request.
@@ -25,10 +24,13 @@ class ChuckerHttpClient extends http.BaseClient {
           method: request.method,
           uri: request.url,
           statusCode: response.statusCode,
-          requestHeaders: Map.unmodifiable(request.headers),
-          responseHeaders: Map.unmodifiable(response.headers),
-          requestBody: _requestBody(request),
-          responseBody: _decode(bytes),
+          requestHeaders: ChuckerFlutterPlus.redactHeaders(request.headers),
+          responseHeaders: ChuckerFlutterPlus.redactHeaders(response.headers),
+          rawRequestBody: _requestBody(request),
+          rawResponseBody: BodyCapture.raw(bytes),
+          requestBodySize: _requestBodySize(request),
+          responseBodySize: response.contentLength ?? bytes.length,
+          contentType: response.headers['content-type'],
         ),
       );
       return http.StreamedResponse(
@@ -41,7 +43,7 @@ class ChuckerHttpClient extends http.BaseClient {
         persistentConnection: response.persistentConnection,
         reasonPhrase: response.reasonPhrase,
       );
-    } catch (error) {
+    } catch (error, stackTrace) {
       await ChuckerFlutterPlus.record(
         NetworkTransaction(
           id: '${request.hashCode}-${startedAt.microsecondsSinceEpoch}',
@@ -50,10 +52,12 @@ class ChuckerHttpClient extends http.BaseClient {
           method: request.method,
           uri: request.url,
           statusCode: null,
-          requestHeaders: Map.unmodifiable(request.headers),
+          requestHeaders: ChuckerFlutterPlus.redactHeaders(request.headers),
           responseHeaders: const {},
-          requestBody: _requestBody(request),
+          rawRequestBody: _requestBody(request),
+          requestBodySize: _requestBodySize(request),
           error: error.toString(),
+          stackTrace: stackTrace.toString(),
         ),
       );
       rethrow;
@@ -63,20 +67,15 @@ class ChuckerHttpClient extends http.BaseClient {
   @override
   void close() => _client.close();
 
-  static Object? _requestBody(http.BaseRequest request) {
+  static String? _requestBody(http.BaseRequest request) {
     if (request case http.Request(:final body)) {
-      return _decode(utf8.encode(body));
+      return body;
     }
-    if (request case http.MultipartRequest(:final fields)) return fields;
+    if (request case http.MultipartRequest(:final fields))
+      return fields.toString();
     return null;
   }
 
-  static Object? _decode(List<int> bytes) {
-    final text = utf8.decode(bytes, allowMalformed: true);
-    try {
-      return jsonDecode(text);
-    } on FormatException {
-      return text;
-    }
-  }
+  static int _requestBodySize(http.BaseRequest request) =>
+      request.contentLength ?? BodyCapture.size(null, _requestBody(request));
 }
