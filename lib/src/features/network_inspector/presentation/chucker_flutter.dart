@@ -56,7 +56,7 @@ class ChuckerFlutterPlus {
     bool? enableOnRelease,
     bool enableNotifications = false,
     String notificationChannelName = 'Network inspector',
-    String notificationIcon = '@drawable/ic_launcher',
+    String notificationIcon = '@drawable/chucker_icon',
     Set<String> redactHeaders = const {'authorization', 'cookie', 'set-cookie'},
     GlobalKey<NavigatorState>? navigatorKey,
     void Function(String? payload)? onUnrecognizedNotificationPayload,
@@ -75,7 +75,8 @@ class ChuckerFlutterPlus {
       redactHeaders: redactHeaders,
     );
     final effectiveNavKey = navigatorKey ?? ChuckerFlutterPlus.navigatorKey;
-    if (effectiveNavKey.currentContext case final context? when context.mounted) {
+    if (effectiveNavKey.currentContext case final context?
+        when context.mounted) {
       _banner.bind(context);
     }
     showNotification = enableNotifications;
@@ -325,7 +326,8 @@ class _IsolatedInspectorState extends State<_IsolatedInspector> {
 class _ChuckerNavigatorObserver extends NavigatorObserver {
   void _updateContext(Route<dynamic>? route) {
     final context =
-        route?.navigator?.context ?? ChuckerFlutterPlus.navigatorKey.currentContext;
+        route?.navigator?.context ??
+        ChuckerFlutterPlus.navigatorKey.currentContext;
     if (context != null && context.mounted) {
       ChuckerFlutterPlus._banner.bind(context);
     }
@@ -358,4 +360,3 @@ class _ChuckerNavigatorObserver extends NavigatorObserver {
 
 /// Alias for backwards compatibility with `chucker_flutter`.
 typedef ChuckerFlutter = ChuckerFlutterPlus;
-

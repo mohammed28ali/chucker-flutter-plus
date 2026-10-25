@@ -90,7 +90,7 @@ For Android add the notification permission to the host app manifest:
 <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 ```
 
-Provide a white-on-transparent drawable named `ic_launcher` (or pass a custom
+Provide a white-on-transparent drawable named `chucker_icon` (or pass a custom
 `notificationIcon`) under `android/app/src/main/res/drawable`. iOS permission
 is requested during `initialize`. Notifications use one rolling summary and a
 `chucker:<request-id>` payload; non-Chucker payloads are forwarded to the host

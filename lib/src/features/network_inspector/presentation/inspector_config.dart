@@ -9,7 +9,7 @@ class InspectorConfig {
     this.inAppNotificationDuration = const Duration(seconds: 3),
     this.inAppNotificationPosition = BannerPosition.top,
     this.notifyOnlyOnError = false,
-    this.statusBarIcon = '@drawable/ic_launcher',
+    this.statusBarIcon = '@drawable/chucker_icon',
     this.maximumEntries = 100,
   });
   final bool showInAppNotification;
