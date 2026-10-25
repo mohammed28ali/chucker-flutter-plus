@@ -35,6 +35,9 @@ class NetworkTransactionRepositoryImpl implements NetworkTransactionRepository {
   @override
   Future<void> clear() => _localDataSource.clear();
 
+  @override
+  Future<void> dispose() => _localDataSource.close();
+
   List<NetworkTransactionModel> _prune(List<NetworkTransactionModel> values) {
     final limit = retention;
     if (limit == null) return values;

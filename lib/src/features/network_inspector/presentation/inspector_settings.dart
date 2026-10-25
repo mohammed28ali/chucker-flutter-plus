@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:hive_ce/hive.dart';
+import 'package:hive_ce_flutter/hive_flutter.dart';
+import '../data/datasources/local/chucker_hive.dart';
 
 enum BannerPosition { top, bottom }
 
@@ -42,30 +44,39 @@ class InspectorSettings {
 
 class InspectorSettingsStore extends ValueNotifier<InspectorSettings> {
   InspectorSettingsStore() : super(const InspectorSettings());
+  static const _boxName = 'chucker_flutter_plus_settings';
+  Box<Map>? _box;
+  Future<Box<Map>> get _open async {
+    await ChuckerHive.initialize();
+    return _box ??= await Hive.openBox<Map>(_boxName);
+  }
+
   Future<void> load() async {
-    final p = await SharedPreferences.getInstance();
+    final p = (await _open).get('settings') ?? const <String, dynamic>{};
     value = InspectorSettings(
-      inAppBanner: p.getBool('banner') ?? true,
-      systemNotifications: p.getBool('system') ?? true,
-      statusBarWhileForeground: p.getBool('statusForeground') ?? false,
-      onlyErrors: p.getBool('errors') ?? false,
-      bannerDuration: Duration(milliseconds: p.getInt('duration') ?? 3000),
-      bannerPosition: (p.getString('position') ?? 'top') == 'bottom'
+      inAppBanner: p['banner'] as bool? ?? true,
+      systemNotifications: p['system'] as bool? ?? true,
+      statusBarWhileForeground: p['statusForeground'] as bool? ?? false,
+      onlyErrors: p['errors'] as bool? ?? false,
+      bannerDuration: Duration(milliseconds: p['duration'] as int? ?? 3000),
+      bannerPosition: (p['position'] as String? ?? 'top') == 'bottom'
           ? BannerPosition.bottom
           : BannerPosition.top,
-      maximumEntries: p.getInt('max') ?? 100,
+      maximumEntries: p['max'] as int? ?? 100,
     );
   }
 
   Future<void> save(InspectorSettings next) async {
     value = next;
-    final p = await SharedPreferences.getInstance();
-    await p.setBool('banner', next.inAppBanner);
-    await p.setBool('system', next.systemNotifications);
-    await p.setBool('statusForeground', next.statusBarWhileForeground);
-    await p.setBool('errors', next.onlyErrors);
-    await p.setInt('duration', next.bannerDuration.inMilliseconds);
-    await p.setString('position', next.bannerPosition.name);
-    await p.setInt('max', next.maximumEntries);
+    await (await _open).put('settings', <String, dynamic>{
+      'schemaVersion': 1,
+      'banner': next.inAppBanner,
+      'system': next.systemNotifications,
+      'statusForeground': next.statusBarWhileForeground,
+      'errors': next.onlyErrors,
+      'duration': next.bannerDuration.inMilliseconds,
+      'position': next.bannerPosition.name,
+      'max': next.maximumEntries,
+    });
   }
 }

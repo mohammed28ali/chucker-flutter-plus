@@ -6,4 +6,6 @@ abstract interface class NetworkTransactionRepository {
   Future<void> save(NetworkTransaction transaction);
 
   Future<void> clear();
+
+  Future<void> dispose();
 }

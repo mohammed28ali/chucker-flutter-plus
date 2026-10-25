@@ -19,6 +19,8 @@ class NetworkTransactionModel extends NetworkTransaction {
     super.imageHeight,
     super.error,
     super.stackTrace,
+    super.requestBodyTruncated,
+    super.responseBodyTruncated,
   });
 
   factory NetworkTransactionModel.fromEntity(NetworkTransaction transaction) =>
@@ -40,6 +42,8 @@ class NetworkTransactionModel extends NetworkTransaction {
         imageHeight: transaction.imageHeight,
         error: transaction.error,
         stackTrace: transaction.stackTrace,
+        requestBodyTruncated: transaction.requestBodyTruncated,
+        responseBodyTruncated: transaction.responseBodyTruncated,
       );
 
   factory NetworkTransactionModel.fromJson(Map<String, Object?> json) =>
@@ -61,10 +65,13 @@ class NetworkTransactionModel extends NetworkTransaction {
         imageHeight: json['imageHeight'] as int?,
         error: json['error'] as String?,
         stackTrace: json['stackTrace'] as String?,
+        requestBodyTruncated: json['requestBodyTruncated'] as bool? ?? false,
+        responseBodyTruncated: json['responseBodyTruncated'] as bool? ?? false,
       );
 
   Map<String, Object?> toJson() => {
     'id': id,
+    'schemaVersion': 1,
     'startedAt': startedAt.toIso8601String(),
     'completedAt': completedAt.toIso8601String(),
     'method': method,
@@ -81,6 +88,8 @@ class NetworkTransactionModel extends NetworkTransaction {
     'imageHeight': imageHeight,
     'error': error,
     'stackTrace': stackTrace,
+    'requestBodyTruncated': requestBodyTruncated,
+    'responseBodyTruncated': responseBodyTruncated,
   };
 
   static Map<String, String> _stringMap(Object? value) =>

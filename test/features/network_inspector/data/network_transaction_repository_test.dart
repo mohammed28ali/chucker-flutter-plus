@@ -1,12 +1,15 @@
+import 'dart:io';
 import 'package:chucker_flutter_plus/src/features/network_inspector/data/datasources/local/network_transaction_local_data_source.dart';
 import 'package:chucker_flutter_plus/src/features/network_inspector/data/repositories/network_transaction_repository_impl.dart';
 import 'package:chucker_flutter_plus/src/features/network_inspector/domain/entities/network_transaction.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:hive_ce/hive.dart';
 
 void main() {
-  setUp(() => SharedPreferences.setMockInitialValues({}));
-
+  late Directory hiveDirectory;
+  setUpAll(() async {
+    hiveDirectory = await Directory.systemTemp.createTemp('chucker_hive_test');
+  });
   NetworkTransaction transaction(String id, DateTime startedAt) =>
       NetworkTransaction(
         id: id,
@@ -22,7 +25,9 @@ void main() {
 
   test('keeps the newest records within its configured capacity', () async {
     final repository = NetworkTransactionRepositoryImpl(
-      NetworkTransactionLocalDataSource(),
+      NetworkTransactionLocalDataSource(
+        initializeHive: () async => Hive.init(hiveDirectory.path),
+      ),
       maximumEntries: 2,
     );
     final first = DateTime.utc(2025);
@@ -42,7 +47,9 @@ void main() {
 
   test('clears persisted records', () async {
     final repository = NetworkTransactionRepositoryImpl(
-      NetworkTransactionLocalDataSource(),
+      NetworkTransactionLocalDataSource(
+        initializeHive: () async => Hive.init(hiveDirectory.path),
+      ),
     );
     await repository.save(transaction('one', DateTime.utc(2025)));
 

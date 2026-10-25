@@ -67,7 +67,7 @@ lib/
     ├── config/dependency_injection/ # Composition root
     └── features/network_inspector/
         ├── domain/                  # Rules and repository contract
-        ├── data/                    # SharedPreferences implementation
+        ├── data/                    # Package-isolated Hive CE implementation
         ├── infrastructure/          # Dio and http adapters
         └── presentation/            # Inspector UI and host integration
 ```
@@ -75,7 +75,7 @@ lib/
 ```text
 Presentation → Domain ← Data
       ↑                    ↑
-   Flutter UI       SharedPreferences
+   Flutter UI          Hive CE
       ↑
 Dio / http adapters
 ```

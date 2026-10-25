@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'dart:convert';
 
 import '../../../config/dependency_injection/chucker_dependencies.dart';
 import '../domain/entities/network_transaction.dart';
@@ -175,6 +176,31 @@ class ChuckerFlutterPlus {
       );
     }
   }
+
+  static Future<void> clearLogs() => _dependencies.transactions.clear();
+  static Future<String> exportLogs() async => jsonEncode(
+    (await _dependencies.transactions.getAll())
+        .map(
+          (t) => {
+            'id': t.id,
+            'method': t.method,
+            'url': t.uri.toString(),
+            'statusCode': t.statusCode,
+            'timestamp': t.startedAt.toIso8601String(),
+            'durationMs': t.duration.inMilliseconds,
+            'requestHeaders': t.requestHeaders,
+            'responseHeaders': t.responseHeaders,
+            'requestBody': t.rawRequestBody,
+            'responseBody': t.rawResponseBody,
+            'error': t.error,
+          },
+        )
+        .toList(),
+  );
+  static Future<void> dispose() async {
+    hideInspector();
+    await _dependencies.transactions.dispose();
+  }
 }
 
 /// Concise public facade for configuration-object based setup.
@@ -218,4 +244,8 @@ class Inspector {
     ChuckerFlutterPlus.showNotification = config.showStatusBarNotification;
     ChuckerFlutterPlus.configure(maximumEntries: config.maximumEntries);
   }
+
+  static Future<void> clearLogs() => ChuckerFlutterPlus.clearLogs();
+  static Future<String> exportLogs() => ChuckerFlutterPlus.exportLogs();
+  static Future<void> dispose() => ChuckerFlutterPlus.dispose();
 }

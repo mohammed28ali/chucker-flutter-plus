@@ -21,6 +21,8 @@ class NetworkTransaction {
     this.imageHeight,
     this.error,
     this.stackTrace,
+    this.requestBodyTruncated = false,
+    this.responseBodyTruncated = false,
   }) : rawRequestBody = rawRequestBody ?? _legacyRaw(requestBody),
        rawResponseBody = rawResponseBody ?? _legacyRaw(responseBody);
 
@@ -41,6 +43,8 @@ class NetworkTransaction {
   final int? imageHeight;
   final String? error;
   final String? stackTrace;
+  final bool requestBodyTruncated;
+  final bool responseBodyTruncated;
 
   Duration get duration => completedAt.difference(startedAt);
 
