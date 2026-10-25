@@ -19,7 +19,6 @@ class SectionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     return Card(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -37,12 +36,12 @@ class SectionCard extends StatelessWidget {
                   Expanded(
                     child: AppText.title(title!),
                   ),
-                  if (trailing != null) trailing!,
+                  ?trailing,
                 ],
               ),
             ),
           if (title != null)
-            Divider(
+            const Divider(
               height: AppSizes.gap12,
               indent: AppSizes.paddingLg,
               endIndent: AppSizes.paddingLg,

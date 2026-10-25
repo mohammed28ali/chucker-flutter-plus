@@ -1,19 +1,20 @@
 import 'dart:convert';
 
 import 'package:chucker_flutter_plus/src/config/theme/inspector_colors.dart';
+import 'package:chucker_flutter_plus/src/core/utils/app_sizes.dart';
+import 'package:chucker_flutter_plus/src/core/utils/app_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 enum _ViewMode { tree, pretty, raw }
 
-/// Smart body viewer that handles JSON, XML/HTML, form-data, plain text, and binary.
 class BodyViewer extends StatefulWidget {
   const BodyViewer({
     super.key,
     required this.body,
     required this.contentType,
     this.truncated = false,
-    this.label = 'Body',
+    this.label = AppStrings.bodyLabel,
   });
   final String? body;
   final String? contentType;
@@ -27,20 +28,14 @@ class BodyViewer extends StatefulWidget {
 class _BodyViewerState extends State<BodyViewer> {
   _ViewMode _mode = _ViewMode.pretty;
   bool _wordWrap = true;
-  String _search = '';
-  int _searchPage = 0;
+  final String _search = '';
   bool _showLineNumbers = false;
 
   bool get _isJson {
     final ct = widget.contentType?.toLowerCase() ?? '';
     if (ct.contains('json')) return true;
     final b = widget.body?.trim() ?? '';
-    return (b.startsWith('{') || b.startsWith('['));
-  }
-
-  bool get _isXml {
-    final ct = widget.contentType?.toLowerCase() ?? '';
-    return ct.contains('xml') || ct.contains('html');
+    return b.startsWith('{') || b.startsWith('[');
   }
 
   bool get _isFormData {
@@ -70,9 +65,9 @@ class _BodyViewerState extends State<BodyViewer> {
 
     if (body == null || body.isEmpty) {
       return Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(AppSizes.paddingLg),
         child: Text(
-          'No body',
+          AppStrings.noBody,
           style: theme.textTheme.bodyMedium?.copyWith(
             color: theme.colorScheme.onSurfaceVariant,
             fontStyle: FontStyle.italic,
@@ -97,7 +92,7 @@ class _BodyViewerState extends State<BodyViewer> {
             Clipboard.setData(ClipboardData(text: body));
             ScaffoldMessenger.maybeOf(context)?.showSnackBar(
               const SnackBar(
-                content: Text('Body copied to clipboard'),
+                content: Text(AppStrings.bodyCopied),
                 duration: Duration(milliseconds: 1500),
               ),
             );
@@ -106,25 +101,31 @@ class _BodyViewerState extends State<BodyViewer> {
         ),
         if (widget.truncated)
           Container(
-            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            margin: const EdgeInsets.symmetric(
+              horizontal: AppSizes.paddingLg,
+              vertical: AppSizes.paddingXs,
+            ),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSizes.paddingSm + 2,
+              vertical: AppSizes.paddingSm - 2,
+            ),
             decoration: BoxDecoration(
               color: theme.colorScheme.tertiaryContainer,
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(AppSizes.radius8),
             ),
             child: Row(
               children: [
                 Icon(
                   Icons.info_outline,
-                  size: 14,
+                  size: AppSizes.icon14,
                   color: theme.colorScheme.onTertiaryContainer,
                 ),
-                const SizedBox(width: 6),
+                const SizedBox(width: AppSizes.gap6),
                 Expanded(
                   child: Text(
-                    'Body truncated — full body was too large to capture.',
+                    AppStrings.bodyTruncatedWarning,
                     style: TextStyle(
-                      fontSize: 12,
+                      fontSize: AppSizes.textMd,
                       color: theme.colorScheme.onTertiaryContainer,
                     ),
                   ),
@@ -186,44 +187,64 @@ class _Toolbar extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 0, 8, 8),
+      padding: const EdgeInsets.fromLTRB(
+        AppSizes.paddingLg,
+        0,
+        AppSizes.paddingSm,
+        AppSizes.paddingSm,
+      ),
       child: Row(
         children: [
           if (isJson) ...[
-            _ModeButton('Tree', _ViewMode.tree, mode, onModeChange),
-            const SizedBox(width: 4),
-            _ModeButton('Pretty', _ViewMode.pretty, mode, onModeChange),
-            const SizedBox(width: 4),
-            _ModeButton('Raw', _ViewMode.raw, mode, onModeChange),
-            const SizedBox(width: 8),
+            _ModeButton(
+              AppStrings.bodyViewTree,
+              _ViewMode.tree,
+              mode,
+              onModeChange,
+            ),
+            const SizedBox(width: AppSizes.gap4),
+            _ModeButton(
+              AppStrings.bodyViewPretty,
+              _ViewMode.pretty,
+              mode,
+              onModeChange,
+            ),
+            const SizedBox(width: AppSizes.gap4),
+            _ModeButton(
+              AppStrings.bodyViewRaw,
+              _ViewMode.raw,
+              mode,
+              onModeChange,
+            ),
+            const SizedBox(width: AppSizes.gap8),
           ],
           const Spacer(),
           Tooltip(
-            message: 'Word wrap',
+            message: AppStrings.wordWrap,
             child: IconButton(
               icon: Icon(
                 Icons.wrap_text,
-                size: 18,
+                size: AppSizes.icon18,
                 color: wordWrap ? theme.colorScheme.primary : null,
               ),
               onPressed: () => onWordWrapChange(!wordWrap),
             ),
           ),
           Tooltip(
-            message: 'Line numbers',
+            message: AppStrings.lineNumbers,
             child: IconButton(
               icon: Icon(
                 Icons.format_list_numbered,
-                size: 18,
+                size: AppSizes.icon18,
                 color: showLineNumbers ? theme.colorScheme.primary : null,
               ),
               onPressed: () => onLineNumbersChange(!showLineNumbers),
             ),
           ),
           Tooltip(
-            message: 'Copy',
+            message: AppStrings.copy,
             child: IconButton(
-              icon: const Icon(Icons.copy_outlined, size: 18),
+              icon: const Icon(Icons.copy_outlined, size: AppSizes.icon18),
               onPressed: onCopy,
             ),
           ),
@@ -246,12 +267,15 @@ class _ModeButton extends StatelessWidget {
       onTap: () => onTap(value),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 150),
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSizes.paddingSm + 2,
+          vertical: AppSizes.paddingXs,
+        ),
         decoration: BoxDecoration(
           color: selected
               ? theme.colorScheme.primaryContainer
               : Colors.transparent,
-          borderRadius: BorderRadius.circular(6),
+          borderRadius: BorderRadius.circular(AppSizes.radiusSm),
           border: Border.all(
             color: selected
                 ? theme.colorScheme.primary
@@ -261,7 +285,7 @@ class _ModeButton extends StatelessWidget {
         child: Text(
           label,
           style: TextStyle(
-            fontSize: 11,
+            fontSize: AppSizes.textSm,
             fontWeight: selected ? FontWeight.w700 : FontWeight.w400,
             color: selected
                 ? theme.colorScheme.primary
@@ -292,20 +316,25 @@ class _TextBody extends StatelessWidget {
     final theme = Theme.of(context);
     final textStyle = TextStyle(
       fontFamily: 'monospace',
-      fontSize: 12.5,
+      fontSize: AppSizes.textSmPlus,
       height: 1.6,
       color: theme.colorScheme.onSurface,
     );
     final lineNumStyle = TextStyle(
       fontFamily: 'monospace',
-      fontSize: 12.5,
+      fontSize: AppSizes.textSmPlus,
       height: 1.6,
-      color: theme.colorScheme.onSurfaceVariant.withOpacity(0.5),
+      color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
     );
 
     return SingleChildScrollView(
       scrollDirection: wordWrap ? Axis.vertical : Axis.horizontal,
-      padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+      padding: const EdgeInsets.fromLTRB(
+        AppSizes.paddingLg,
+        0,
+        AppSizes.paddingLg,
+        AppSizes.paddingLg,
+      ),
       child: showLineNumbers
           ? Row(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -317,7 +346,7 @@ class _TextBody extends StatelessWidget {
                       Text('${i + 1}', style: lineNumStyle),
                   ],
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: AppSizes.gap12),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [for (final l in lines) Text(l, style: textStyle)],
@@ -338,7 +367,12 @@ class _JsonTree extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+      padding: const EdgeInsets.fromLTRB(
+        AppSizes.paddingLg,
+        0,
+        AppSizes.paddingLg,
+        AppSizes.paddingLg,
+      ),
       child: _JsonNode(value: json, depth: 0, expanded: true),
     );
   }
@@ -376,7 +410,7 @@ class _JsonNodeState extends State<_JsonNode> {
 
     if (v is Map<String, dynamic> || v is List) {
       final isMap = v is Map;
-      final count = isMap ? (v as Map).length : (v as List).length;
+      final count = isMap ? v.length : (v as List).length;
       final bracket = isMap ? ('{', '}') : ('[', ']');
 
       return Column(
@@ -389,7 +423,7 @@ class _JsonNodeState extends State<_JsonNode> {
               children: [
                 Icon(
                   _expanded ? Icons.arrow_drop_down : Icons.arrow_right,
-                  size: 18,
+                  size: AppSizes.icon18,
                   color: isDark
                       ? InspectorColors.jsonKeyDark
                       : InspectorColors.jsonKey,
@@ -399,7 +433,7 @@ class _JsonNodeState extends State<_JsonNode> {
                     '"$key": ',
                     style: TextStyle(
                       fontFamily: 'monospace',
-                      fontSize: 12,
+                      fontSize: AppSizes.textMd,
                       color: isDark
                           ? InspectorColors.jsonKeyDark
                           : InspectorColors.jsonKey,
@@ -409,10 +443,10 @@ class _JsonNodeState extends State<_JsonNode> {
                 Text(
                   _expanded
                       ? bracket.$1
-                      : '${bracket.$1}…${bracket.$2} $count items',
+                      : '${bracket.$1}…${bracket.$2} $count ${AppStrings.items}',
                   style: TextStyle(
                     fontFamily: 'monospace',
-                    fontSize: 12,
+                    fontSize: AppSizes.textMd,
                     color: isDark ? Colors.white70 : Colors.black87,
                   ),
                 ),
@@ -421,7 +455,7 @@ class _JsonNodeState extends State<_JsonNode> {
           ),
           if (_expanded)
             Padding(
-              padding: const EdgeInsets.only(left: 16),
+              padding: const EdgeInsets.only(left: AppSizes.paddingLg),
               child: isMap
                   ? Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -455,7 +489,10 @@ class _JsonNodeState extends State<_JsonNode> {
           if (_expanded)
             Text(
               bracket.$2,
-              style: const TextStyle(fontFamily: 'monospace', fontSize: 12),
+              style: const TextStyle(
+                fontFamily: 'monospace',
+                fontSize: AppSizes.textMd,
+              ),
             ),
         ],
       );
@@ -472,7 +509,7 @@ class _JsonNodeState extends State<_JsonNode> {
                 text: '"$key": ',
                 style: TextStyle(
                   fontFamily: 'monospace',
-                  fontSize: 12,
+                  fontSize: AppSizes.textMd,
                   color: isDark
                       ? InspectorColors.jsonKeyDark
                       : InspectorColors.jsonKey,
@@ -483,7 +520,7 @@ class _JsonNodeState extends State<_JsonNode> {
               text: _format(v),
               style: TextStyle(
                 fontFamily: 'monospace',
-                fontSize: 12,
+                fontSize: AppSizes.textMd,
                 color: _color(v, isDark),
               ),
             ),
@@ -500,14 +537,18 @@ class _JsonNodeState extends State<_JsonNode> {
   }
 
   Color _color(Object? v, bool dark) {
-    if (v == null)
+    if (v == null) {
       return dark ? InspectorColors.jsonNullDark : InspectorColors.jsonNull;
-    if (v is String)
+    }
+    if (v is String) {
       return dark ? InspectorColors.jsonStringDark : InspectorColors.jsonString;
-    if (v is num)
+    }
+    if (v is num) {
       return dark ? InspectorColors.jsonNumberDark : InspectorColors.jsonNumber;
-    if (v is bool)
+    }
+    if (v is bool) {
       return dark ? InspectorColors.jsonBoolDark : InspectorColors.jsonBool;
+    }
     return dark ? Colors.white70 : Colors.black87;
   }
 }
@@ -524,17 +565,25 @@ class _FormDataTable extends StatelessWidget {
     final pairs = Uri.splitQueryString(body).entries.toList();
     if (pairs.isEmpty) {
       return Padding(
-        padding: const EdgeInsets.all(16),
-        child: Text('(empty form data)', style: theme.textTheme.bodyMedium),
+        padding: const EdgeInsets.all(AppSizes.paddingLg),
+        child: Text(
+          AppStrings.emptyFormData,
+          style: theme.textTheme.bodyMedium,
+        ),
       );
     }
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+      padding: const EdgeInsets.fromLTRB(
+        AppSizes.paddingLg,
+        0,
+        AppSizes.paddingLg,
+        AppSizes.paddingLg,
+      ),
       child: Table(
         columnWidths: const {0: IntrinsicColumnWidth(), 1: FlexColumnWidth()},
         border: TableBorder.all(
           color: theme.colorScheme.outlineVariant,
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(AppSizes.radius8),
         ),
         children: [
           TableRow(
@@ -542,8 +591,8 @@ class _FormDataTable extends StatelessWidget {
               color: theme.colorScheme.surfaceContainerHighest,
             ),
             children: [
-              _cell('Key', bold: true, theme: theme),
-              _cell('Value', bold: true, theme: theme),
+              _cell(AppStrings.key, bold: true, theme: theme),
+              _cell(AppStrings.value, bold: true, theme: theme),
             ],
           ),
           ...pairs.map(
@@ -561,7 +610,10 @@ class _FormDataTable extends StatelessWidget {
 
   Widget _cell(String text, {bool bold = false, required ThemeData theme}) =>
       Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSizes.paddingMd,
+          vertical: AppSizes.paddingSm,
+        ),
         child: Text(
           text,
           style: theme.textTheme.bodySmall?.copyWith(

@@ -4,7 +4,6 @@ import '../../../../config/theme/inspector_colors.dart';
 import '../../../../core/core.dart';
 import '../../domain/entities/network_transaction.dart';
 import 'method_chip.dart';
-import 'status_badge.dart';
 
 /// Summary header showing aggregate stats about all captured requests.
 class SummaryHeader extends StatelessWidget {
@@ -48,7 +47,12 @@ class SummaryHeader extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          _stat(context, '$total', AppStrings.statTotal, Icons.list_alt_outlined),
+          _stat(
+            context,
+            '$total',
+            AppStrings.statTotal,
+            Icons.list_alt_outlined,
+          ),
           _divider(context),
           _stat(
             context,
@@ -66,9 +70,19 @@ class SummaryHeader extends StatelessWidget {
             color: InspectorColors.status5xx,
           ),
           _divider(context),
-          _stat(context, '${avgMs}ms', AppStrings.statAvg, Icons.timer_outlined),
+          _stat(
+            context,
+            '${avgMs}ms',
+            AppStrings.statAvg,
+            Icons.timer_outlined,
+          ),
           _divider(context),
-          _stat(context, _size(totalBytes), AppStrings.statData, Icons.data_usage_outlined),
+          _stat(
+            context,
+            _size(totalBytes),
+            AppStrings.statData,
+            Icons.data_usage_outlined,
+          ),
         ],
       ),
     );
@@ -86,7 +100,7 @@ class SummaryHeader extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, size: AppSizes.iconMd, color: c.withOpacity(0.7)),
+        Icon(icon, size: AppSizes.iconMd, color: c.withValues(alpha: 0.7)),
         const SizedBox(height: AppSizes.gap4),
         AppText.stat(value, style: TextStyle(color: c)),
         AppText.caption(

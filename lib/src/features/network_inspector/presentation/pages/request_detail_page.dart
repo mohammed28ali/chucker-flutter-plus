@@ -1,18 +1,18 @@
 import 'dart:convert';
 
-import 'package:chucker_flutter_plus/src/config/theme/inspector_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../../../../core/core.dart';
 import '../../domain/entities/network_transaction.dart';
-import '../widgets/method_chip.dart';
-import '../widgets/status_badge.dart';
-import '../widgets/key_value_row.dart';
-import '../widgets/section_card.dart';
-import '../widgets/headers_section.dart';
-import '../widgets/body_viewer.dart';
 import '../chucker_flutter.dart';
+import '../widgets/body_viewer.dart';
+import '../widgets/headers_section.dart';
+import '../widgets/key_value_row.dart';
+import '../widgets/method_chip.dart';
+import '../widgets/section_card.dart';
+import '../widgets/status_badge.dart';
 
 class RequestDetailPage extends StatefulWidget {
   const RequestDetailPage({super.key, required this.transaction});
@@ -32,12 +32,13 @@ class _RequestDetailPageState extends State<RequestDetailPage>
     super.initState();
     final t = widget.transaction;
     _tabs = [
-      _TabDef('Overview', Icons.info_outline),
-      _TabDef('Request', Icons.upload_outlined),
-      _TabDef('Response', Icons.download_outlined),
-      _TabDef('Raw', Icons.code),
-      if (t.error != null) _TabDef('Error', Icons.error_outline),
-      if (_isMedia(t)) _TabDef('Media', Icons.image_outlined),
+      const _TabDef(AppStrings.tabOverview, Icons.info_outline),
+      const _TabDef(AppStrings.tabRequest, Icons.upload_outlined),
+      const _TabDef(AppStrings.tabResponse, Icons.download_outlined),
+      const _TabDef(AppStrings.tabRaw, Icons.code),
+      if (t.error != null)
+        const _TabDef(AppStrings.tabError, Icons.error_outline),
+      if (_isMedia(t)) const _TabDef(AppStrings.tabMedia, Icons.image_outlined),
     ];
     _tabCtrl = TabController(length: _tabs.length, vsync: this);
   }
@@ -73,7 +74,7 @@ class _RequestDetailPageState extends State<RequestDetailPage>
             actions: [
               IconButton(
                 icon: const Icon(Icons.share_outlined),
-                tooltip: 'Share as cURL',
+                tooltip: AppStrings.shareAsCurl,
                 onPressed: () => _shareCurl(t),
               ),
               PopupMenuButton<String>(
@@ -81,15 +82,15 @@ class _RequestDetailPageState extends State<RequestDetailPage>
                 itemBuilder: (_) => [
                   const PopupMenuItem(
                     value: 'copy_curl',
-                    child: Text('Copy cURL'),
+                    child: Text(AppStrings.copyCurl),
                   ),
                   const PopupMenuItem(
                     value: 'copy_url',
-                    child: Text('Copy URL'),
+                    child: Text(AppStrings.copyUrl),
                   ),
                   const PopupMenuItem(
                     value: 'share_json',
-                    child: Text('Share as JSON'),
+                    child: Text(AppStrings.shareAsJson),
                   ),
                 ],
                 onSelected: (v) => _onAction(v, t),
@@ -101,7 +102,12 @@ class _RequestDetailPageState extends State<RequestDetailPage>
                 color: theme.scaffoldBackgroundColor,
                 child: SafeArea(
                   child: Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 56, 16, 0),
+                    padding: const EdgeInsets.fromLTRB(
+                      AppSizes.paddingLg,
+                      56,
+                      AppSizes.paddingLg,
+                      0,
+                    ),
                     child: _Header(transaction: t),
                   ),
                 ),
@@ -117,8 +123,8 @@ class _RequestDetailPageState extends State<RequestDetailPage>
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(tab.icon, size: 16),
-                          const SizedBox(width: 6),
+                          Icon(tab.icon, size: AppSizes.iconMd),
+                          const SizedBox(width: AppSizes.gap6),
                           Text(tab.label),
                         ],
                       ),
@@ -138,12 +144,12 @@ class _RequestDetailPageState extends State<RequestDetailPage>
 
   Widget _buildTab(String label, NetworkTransaction t) {
     return switch (label) {
-      'Overview' => _OverviewTab(transaction: t),
-      'Request' => _RequestTab(transaction: t),
-      'Response' => _ResponseTab(transaction: t),
-      'Raw' => _RawTab(transaction: t),
-      'Error' => _ErrorTab(transaction: t),
-      'Media' => _MediaTab(transaction: t),
+      AppStrings.tabOverview => _OverviewTab(transaction: t),
+      AppStrings.tabRequest => _RequestTab(transaction: t),
+      AppStrings.tabResponse => _ResponseTab(transaction: t),
+      AppStrings.tabRaw => _RawTab(transaction: t),
+      AppStrings.tabError => _ErrorTab(transaction: t),
+      AppStrings.tabMedia => _MediaTab(transaction: t),
       _ => const SizedBox.shrink(),
     };
   }
@@ -159,7 +165,7 @@ class _RequestDetailPageState extends State<RequestDetailPage>
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('cURL copied'),
+              content: Text(AppStrings.curlCopied),
               duration: Duration(milliseconds: 1500),
             ),
           );
@@ -169,7 +175,7 @@ class _RequestDetailPageState extends State<RequestDetailPage>
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('URL copied'),
+              content: Text(AppStrings.urlCopied),
               duration: Duration(milliseconds: 1500),
             ),
           );
@@ -229,13 +235,13 @@ class _HeaderState extends State<_Header> {
         Row(
           children: [
             MethodChip(t.method),
-            const SizedBox(width: 8),
+            const SizedBox(width: AppSizes.gap8),
             StatusBadge(t.statusCode, error: t.error),
-            const SizedBox(width: 8),
+            const SizedBox(width: AppSizes.gap8),
             Text(
               _fmtDuration(t.duration),
               style: TextStyle(
-                fontSize: 12,
+                fontSize: AppSizes.textMd,
                 fontWeight: FontWeight.w600,
                 color: theme.colorScheme.onSurfaceVariant,
               ),
@@ -244,13 +250,13 @@ class _HeaderState extends State<_Header> {
             Text(
               _relTime(t.startedAt),
               style: TextStyle(
-                fontSize: 12,
+                fontSize: AppSizes.textMd,
                 color: theme.colorScheme.onSurfaceVariant,
               ),
             ),
           ],
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppSizes.gap8),
         // URL (expandable)
         GestureDetector(
           onTap: () => setState(() => _urlExpanded = !_urlExpanded),
@@ -258,7 +264,7 @@ class _HeaderState extends State<_Header> {
             Clipboard.setData(ClipboardData(text: t.uri.toString()));
             ScaffoldMessenger.maybeOf(context)?.showSnackBar(
               const SnackBar(
-                content: Text('URL copied'),
+                content: Text(AppStrings.urlCopied),
                 duration: Duration(milliseconds: 1200),
               ),
             );
@@ -270,7 +276,7 @@ class _HeaderState extends State<_Header> {
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontFamily: 'monospace',
-                fontSize: 12.5,
+                fontSize: AppSizes.textSmPlus,
                 color: theme.colorScheme.primary,
                 height: 1.4,
               ),
@@ -279,7 +285,7 @@ class _HeaderState extends State<_Header> {
               t.uri.toString(),
               style: TextStyle(
                 fontFamily: 'monospace',
-                fontSize: 12.5,
+                fontSize: AppSizes.textSmPlus,
                 color: theme.colorScheme.primary,
                 height: 1.4,
               ),
@@ -290,34 +296,34 @@ class _HeaderState extends State<_Header> {
             duration: const Duration(milliseconds: 200),
           ),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppSizes.gap8),
         // Size row
         Row(
           children: [
             Icon(
               Icons.upload_outlined,
-              size: 14,
+              size: AppSizes.icon14,
               color: theme.colorScheme.onSurfaceVariant,
             ),
-            const SizedBox(width: 4),
+            const SizedBox(width: AppSizes.gap4),
             Text(
               _sizeStr(t.requestBodySize),
               style: TextStyle(
-                fontSize: 11,
+                fontSize: AppSizes.textSm,
                 color: theme.colorScheme.onSurfaceVariant,
               ),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: AppSizes.gap12),
             Icon(
               Icons.download_outlined,
-              size: 14,
+              size: AppSizes.icon14,
               color: theme.colorScheme.onSurfaceVariant,
             ),
-            const SizedBox(width: 4),
+            const SizedBox(width: AppSizes.gap4),
             Text(
               _sizeStr(t.responseBodySize),
               style: TextStyle(
-                fontSize: 11,
+                fontSize: AppSizes.textSm,
                 color: theme.colorScheme.onSurfaceVariant,
               ),
             ),
@@ -328,8 +334,9 @@ class _HeaderState extends State<_Header> {
   }
 
   String _fmtDuration(Duration d) {
-    if (d.inSeconds >= 1)
+    if (d.inSeconds >= 1) {
       return '${(d.inMilliseconds / 1000).toStringAsFixed(1)}s';
+    }
     return '${d.inMilliseconds}ms';
   }
 
@@ -357,29 +364,39 @@ class _OverviewTab extends StatelessWidget {
   Widget build(BuildContext context) {
     final t = transaction;
     final rows = <(String, String, bool)>[
-      ('URL', t.uri.toString(), true),
-      ('Method', t.method, false),
-      ('Status', t.statusCode != null ? '${t.statusCode}' : 'Error', false),
-      ('Host', t.host, true),
-      ('Path', t.uri.path.isEmpty ? '/' : t.uri.path, true),
-      ('Query', t.uri.query.isEmpty ? '—' : t.uri.query, true),
-      ('Content-Type', t.contentType ?? '—', false),
-      ('Request size', _sizeStr(t.requestBodySize), false),
-      ('Response size', _sizeStr(t.responseBodySize), false),
-      ('Duration', '${t.duration.inMilliseconds} ms', false),
-      ('Started', t.startedAt.toLocal().toString(), false),
-      ('Completed', t.completedAt.toLocal().toString(), false),
-      if (t.requestBodyTruncated) ('Request body', 'Truncated', false),
-      if (t.responseBodyTruncated) ('Response body', 'Truncated', false),
+      (AppStrings.labelUrl, t.uri.toString(), true),
+      (AppStrings.labelMethod, t.method, false),
+      (
+        AppStrings.labelStatus,
+        t.statusCode != null ? '${t.statusCode}' : AppStrings.filterError,
+        false,
+      ),
+      (AppStrings.labelHost, t.host, true),
+      (AppStrings.labelPath, t.uri.path.isEmpty ? '/' : t.uri.path, true),
+      (AppStrings.labelQuery, t.uri.query.isEmpty ? '—' : t.uri.query, true),
+      (AppStrings.labelContentType, t.contentType ?? '—', false),
+      (AppStrings.labelRequestSize, _sizeStr(t.requestBodySize), false),
+      (AppStrings.labelResponseSize, _sizeStr(t.responseBodySize), false),
+      (AppStrings.labelDuration, '${t.duration.inMilliseconds} ms', false),
+      (AppStrings.labelStarted, t.startedAt.toLocal().toString(), false),
+      (AppStrings.labelCompleted, t.completedAt.toLocal().toString(), false),
+      if (t.requestBodyTruncated)
+        (AppStrings.labelRequestBody, AppStrings.labelTruncated, false),
+      if (t.responseBodyTruncated)
+        (AppStrings.labelResponseBody, AppStrings.labelTruncated, false),
       if (t.imageWidth != null && t.imageHeight != null)
-        ('Dimensions', '${t.imageWidth} × ${t.imageHeight}', false),
+        (
+          AppStrings.labelDimensions,
+          '${t.imageWidth} × ${t.imageHeight}',
+          false,
+        ),
     ];
 
     return ListView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppSizes.paddingLg),
       children: [
         SectionCard(
-          title: 'General',
+          title: AppStrings.labelGeneral,
           child: Column(
             children: [
               for (int i = 0; i < rows.length; i++) ...[
@@ -414,16 +431,16 @@ class _RequestTab extends StatelessWidget {
   Widget build(BuildContext context) {
     final t = transaction;
     return ListView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppSizes.paddingLg),
       children: [
         HeadersSection(
           headers: t.requestHeaders,
-          title: 'Request Headers',
+          title: AppStrings.labelRequestHeaders,
           sensitiveKeys: ChuckerFlutterPlus.sensitiveHeaders,
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: AppSizes.gap12),
         SectionCard(
-          title: 'Request Body',
+          title: AppStrings.requestBodyLabel,
           padding: EdgeInsets.zero,
           child: BodyViewer(
             body: t.rawRequestBody,
@@ -431,7 +448,7 @@ class _RequestTab extends StatelessWidget {
                 t.requestHeaders['content-type'] ??
                 t.requestHeaders['Content-Type'],
             truncated: t.requestBodyTruncated,
-            label: 'Request Body',
+            label: AppStrings.requestBodyLabel,
           ),
         ),
       ],
@@ -449,16 +466,16 @@ class _ResponseTab extends StatelessWidget {
   Widget build(BuildContext context) {
     final t = transaction;
     return ListView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppSizes.paddingLg),
       children: [
         HeadersSection(
           headers: t.responseHeaders,
-          title: 'Response Headers',
+          title: AppStrings.labelResponseHeaders,
           sensitiveKeys: ChuckerFlutterPlus.sensitiveHeaders,
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: AppSizes.gap12),
         SectionCard(
-          title: 'Response Body',
+          title: AppStrings.responseBodyLabel,
           padding: EdgeInsets.zero,
           child: BodyViewer(
             body: t.rawResponseBody,
@@ -467,7 +484,7 @@ class _ResponseTab extends StatelessWidget {
                 t.responseHeaders['content-type'] ??
                 t.responseHeaders['Content-Type'],
             truncated: t.responseBodyTruncated,
-            label: 'Response Body',
+            label: AppStrings.responseBodyLabel,
           ),
         ),
       ],
@@ -502,13 +519,13 @@ class _RawTabState extends State<_RawTab> {
     final t = widget.transaction;
     final theme = Theme.of(context);
     return ListView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppSizes.paddingLg),
       children: [
         Row(
           children: [
             Expanded(
               child: Text(
-                'Raw Payloads',
+                AppStrings.rawPayloads,
                 style: theme.textTheme.titleSmall?.copyWith(
                   fontWeight: FontWeight.w700,
                 ),
@@ -516,7 +533,10 @@ class _RawTabState extends State<_RawTab> {
             ),
             Row(
               children: [
-                const Text('Formatted', style: TextStyle(fontSize: 13)),
+                const Text(
+                  AppStrings.labelFormatted,
+                  style: TextStyle(fontSize: AppSizes.textBase),
+                ),
                 Switch(
                   value: _formatted,
                   onChanged: (v) => setState(() => _formatted = v),
@@ -525,15 +545,15 @@ class _RawTabState extends State<_RawTab> {
             ),
           ],
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: AppSizes.gap12),
         SectionCard(
-          title: 'Request',
+          title: AppStrings.tabRequest,
           padding: EdgeInsets.zero,
           child: _RawText(text: _formatIfJson(t.rawRequestBody)),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: AppSizes.gap12),
         SectionCard(
-          title: 'Response',
+          title: AppStrings.tabResponse,
           padding: EdgeInsets.zero,
           child: _RawText(text: _formatIfJson(t.rawResponseBody)),
         ),
@@ -549,12 +569,12 @@ class _RawText extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Padding(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppSizes.paddingLg),
       child: SelectableText(
         text,
         style: TextStyle(
           fontFamily: 'monospace',
-          fontSize: 12,
+          fontSize: AppSizes.textMd,
           height: 1.6,
           color: theme.colorScheme.onSurface,
         ),
@@ -573,18 +593,18 @@ class _ErrorTab extends StatelessWidget {
     if (error == null) return '';
     final e = error.toLowerCase();
     if (e.contains('timeout') || e.contains('timedout')) {
-      return 'Timeout: the server did not respond in time. Check your network connection or increase the timeout setting.';
+      return AppStrings.errorTimeout;
     }
     if (e.contains('connection refused') || e.contains('connrefused')) {
-      return 'Connection refused: the server actively rejected the connection. Check if the server is running and the port is correct.';
+      return AppStrings.errorConnRefused;
     }
     if (e.contains('certificate') || e.contains('ssl') || e.contains('tls')) {
-      return 'SSL/TLS error: certificate verification failed. The server may have an invalid or self-signed certificate.';
+      return AppStrings.errorSsl;
     }
     if (e.contains('no route') ||
         e.contains('unreachable') ||
         e.contains('network')) {
-      return 'Network unreachable: no route to host. Check your network connection.';
+      return AppStrings.errorNetworkUnreachable;
     }
     return '';
   }
@@ -596,15 +616,15 @@ class _ErrorTab extends StatelessWidget {
     final hint = _hint(t.error);
 
     return ListView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppSizes.paddingLg),
       children: [
         if (hint.isNotEmpty)
           Container(
-            margin: const EdgeInsets.only(bottom: 16),
-            padding: const EdgeInsets.all(16),
+            margin: const EdgeInsets.only(bottom: AppSizes.gap16),
+            padding: const EdgeInsets.all(AppSizes.paddingLg),
             decoration: BoxDecoration(
               color: theme.colorScheme.tertiaryContainer,
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(AppSizes.radiusMd),
             ),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -612,15 +632,15 @@ class _ErrorTab extends StatelessWidget {
                 Icon(
                   Icons.lightbulb_outline,
                   color: theme.colorScheme.onTertiaryContainer,
-                  size: 20,
+                  size: AppSizes.iconLg,
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: AppSizes.gap12),
                 Expanded(
                   child: Text(
                     hint,
                     style: TextStyle(
                       color: theme.colorScheme.onTertiaryContainer,
-                      fontSize: 13,
+                      fontSize: AppSizes.textBase,
                       height: 1.5,
                     ),
                   ),
@@ -629,17 +649,25 @@ class _ErrorTab extends StatelessWidget {
             ),
           ),
         SectionCard(
-          title: 'Error',
+          title: AppStrings.tabError,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              KeyValueRow(label: 'Type', value: t.error ?? '—'),
+              KeyValueRow(
+                label: AppStrings.labelType,
+                value: t.error ?? '—',
+              ),
               if (t.stackTrace != null) ...[
                 const KeyValueDivider(),
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                  padding: const EdgeInsets.fromLTRB(
+                    AppSizes.paddingLg,
+                    AppSizes.paddingSm,
+                    AppSizes.paddingLg,
+                    AppSizes.paddingSm,
+                  ),
                   child: Text(
-                    'Stack Trace',
+                    AppStrings.labelStackTrace,
                     style: theme.textTheme.labelSmall?.copyWith(
                       color: theme.colorScheme.onSurfaceVariant,
                       fontWeight: FontWeight.w600,
@@ -648,12 +676,17 @@ class _ErrorTab extends StatelessWidget {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+                  padding: const EdgeInsets.fromLTRB(
+                    AppSizes.paddingLg,
+                    0,
+                    AppSizes.paddingLg,
+                    AppSizes.paddingSm,
+                  ),
                   child: SelectableText(
                     t.stackTrace!,
                     style: TextStyle(
                       fontFamily: 'monospace',
-                      fontSize: 11.5,
+                      fontSize: AppSizes.textSmPlus,
                       height: 1.6,
                       color: theme.colorScheme.error,
                     ),
@@ -677,24 +710,29 @@ class _MediaTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = transaction;
-    final theme = Theme.of(context);
     final ct = t.contentType?.toLowerCase() ?? '';
     final isImage = ct.startsWith('image/');
 
     return ListView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppSizes.paddingLg),
       children: [
         SectionCard(
-          title: 'Media Info',
+          title: AppStrings.labelMediaInfo,
           child: Column(
             children: [
-              KeyValueRow(label: 'Content-Type', value: t.contentType ?? '—'),
+              KeyValueRow(
+                label: AppStrings.labelContentType,
+                value: t.contentType ?? '—',
+              ),
               const KeyValueDivider(),
-              KeyValueRow(label: 'Size', value: _sizeStr(t.responseBodySize)),
+              KeyValueRow(
+                label: AppStrings.labelSize,
+                value: _sizeStr(t.responseBodySize),
+              ),
               if (t.imageWidth != null && t.imageHeight != null) ...[
                 const KeyValueDivider(),
                 KeyValueRow(
-                  label: 'Dimensions',
+                  label: AppStrings.labelDimensions,
                   value: '${t.imageWidth} × ${t.imageHeight} px',
                 ),
               ],
@@ -702,11 +740,11 @@ class _MediaTab extends StatelessWidget {
           ),
         ),
         if (isImage && t.rawResponseBody != null) ...[
-          const SizedBox(height: 12),
+          const SizedBox(height: AppSizes.gap12),
           SectionCard(
-            title: 'Preview',
+            title: AppStrings.labelPreview,
             child: Padding(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(AppSizes.paddingLg),
               child: Builder(
                 builder: (context) {
                   try {
@@ -714,11 +752,11 @@ class _MediaTab extends StatelessWidget {
                     return GestureDetector(
                       onTap: () => _showFullImage(context, bytes),
                       child: ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(AppSizes.radius8),
                         child: Image.memory(
                           bytes,
                           fit: BoxFit.contain,
-                          errorBuilder: (_, __, ___) =>
+                          errorBuilder: (context, error, stackTrace) =>
                               const _MediaPlaceholder(),
                         ),
                       ),
@@ -768,7 +806,7 @@ class _MediaPlaceholder extends StatelessWidget {
       height: 200,
       decoration: BoxDecoration(
         color: theme.colorScheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(AppSizes.radius8),
       ),
       child: Center(
         child: Column(
@@ -776,12 +814,12 @@ class _MediaPlaceholder extends StatelessWidget {
           children: [
             Icon(
               Icons.image_not_supported_outlined,
-              size: 40,
+              size: AppSizes.iconXxl,
               color: theme.colorScheme.onSurfaceVariant,
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppSizes.gap8),
             Text(
-              'Preview not available',
+              AppStrings.previewNotAvailable,
               style: TextStyle(color: theme.colorScheme.onSurfaceVariant),
             ),
           ],

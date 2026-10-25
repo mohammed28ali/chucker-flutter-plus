@@ -21,22 +21,30 @@ abstract final class AppSizes {
   static const double gap40 = 40;
 
   // ── Border radii ────────────────────────────────────────────────────────
+  /// Extra small: 5
+  static const double radiusXs = 5;
+
   /// Small chip / badge: 6
   static const double radiusSm = 6;
+
+  /// Rounded elements: 8
+  static const double radius8 = 8;
 
   /// Standard card / container: 12
   static const double radiusMd = 12;
 
-  /// Large sheet / dialog: 16
-  static const double radiusLg = 16;
-
   /// Banner / overlay: 14
   static const double radiusBanner = 14;
+
+  /// Large sheet / dialog: 16
+  static const double radiusLg = 16;
 
   // ── Icon sizes ──────────────────────────────────────────────────────────
   static const double iconXs = 10;
   static const double iconSm = 12;
+  static const double icon14 = 14;
   static const double iconMd = 16;
+  static const double icon18 = 18;
   static const double iconLg = 20;
   static const double iconXl = 24;
   static const double iconXxl = 40;

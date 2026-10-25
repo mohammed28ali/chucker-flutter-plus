@@ -1,9 +1,10 @@
 import 'dart:async';
 
-import 'package:chucker_flutter_plus/src/config/theme/inspector_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../../config/theme/inspector_colors.dart';
+import '../../../core/core.dart';
 import '../domain/entities/network_transaction.dart';
 import 'inspector_settings.dart';
 
@@ -106,9 +107,6 @@ class _AnimatedBannerState extends State<_AnimatedBanner>
     final t = widget.transaction;
     final code = t.statusCode ?? 0;
     final hasError = t.error != null && code == 0;
-    final (fg, bg) = hasError
-        ? (InspectorColors.statusError, InspectorColors.statusErrorBg)
-        : InspectorColors.statusColors(code == 0 ? null : code, dark: false);
 
     final stripColor = hasError
         ? InspectorColors.statusError
@@ -121,8 +119,8 @@ class _AnimatedBannerState extends State<_AnimatedBanner>
         : InspectorColors.status2xx;
 
     return Positioned(
-      left: 12,
-      right: 12,
+      left: AppSizes.paddingMd,
+      right: AppSizes.paddingMd,
       top: widget.top ? 44 : null,
       bottom: widget.top ? null : 24,
       child: FadeTransition(
@@ -135,30 +133,32 @@ class _AnimatedBannerState extends State<_AnimatedBanner>
             onDismissed: (_) => widget.onDismiss(),
             child: Material(
               elevation: 8,
-              shadowColor: Colors.black.withOpacity(0.3),
-              borderRadius: BorderRadius.circular(14),
+              shadowColor: Colors.black.withValues(alpha: 0.3),
+              borderRadius: BorderRadius.circular(AppSizes.radiusBanner),
               color: Colors.white,
               child: InkWell(
-                borderRadius: BorderRadius.circular(14),
+                borderRadius: BorderRadius.circular(AppSizes.radiusBanner),
                 onTap: _dismiss,
                 child: Row(
                   children: [
                     // Color strip
                     Container(
-                      width: 5,
-                      height: 64,
+                      width: AppSizes.bannerStripWidth,
+                      height: AppSizes.bannerStripHeight,
                       decoration: BoxDecoration(
                         color: stripColor,
                         borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(14),
-                          bottomLeft: Radius.circular(14),
+                          topLeft: Radius.circular(AppSizes.radiusBanner),
+                          bottomLeft: Radius.circular(AppSizes.radiusBanner),
                         ),
                       ),
                     ),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: AppSizes.gap12),
                     Expanded(
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        padding: const EdgeInsets.symmetric(
+                          vertical: AppSizes.paddingMd,
+                        ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           mainAxisSize: MainAxisSize.min,
@@ -166,36 +166,36 @@ class _AnimatedBannerState extends State<_AnimatedBanner>
                             Row(
                               children: [
                                 _MethodBadge(t.method),
-                                const SizedBox(width: 6),
+                                const SizedBox(width: AppSizes.gap6),
                                 _StatusLabel(t.statusCode, t.error, stripColor),
                                 const Spacer(),
                                 Text(
                                   _fmtDuration(t.duration),
                                   style: const TextStyle(
-                                    fontSize: 11,
+                                    fontSize: AppSizes.textSm,
                                     color: Colors.black54,
                                   ),
                                 ),
-                                const SizedBox(width: 8),
+                                const SizedBox(width: AppSizes.gap8),
                               ],
                             ),
-                            const SizedBox(height: 4),
+                            const SizedBox(height: AppSizes.gap4),
                             Text(
                               t.uri.toString(),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: const TextStyle(
                                 fontFamily: 'monospace',
-                                fontSize: 11.5,
+                                fontSize: AppSizes.textSmPlus,
                                 color: Colors.black87,
                               ),
                             ),
                             if (widget.extra > 0) ...[
-                              const SizedBox(height: 2),
+                              const SizedBox(height: AppSizes.gap2),
                               Text(
                                 '+${widget.extra} more request${widget.extra == 1 ? '' : 's'}',
                                 style: const TextStyle(
-                                  fontSize: 11,
+                                  fontSize: AppSizes.textSm,
                                   color: Colors.black54,
                                   fontStyle: FontStyle.italic,
                                 ),
@@ -214,20 +214,20 @@ class _AnimatedBannerState extends State<_AnimatedBanner>
                       style: TextButton.styleFrom(
                         foregroundColor: stripColor,
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 8,
+                          horizontal: AppSizes.paddingMd,
+                          vertical: AppSizes.paddingSm,
                         ),
                         minimumSize: Size.zero,
                       ),
                       child: const Text(
-                        'Details',
+                        AppStrings.details,
                         style: TextStyle(
                           fontWeight: FontWeight.w700,
-                          fontSize: 13,
+                          fontSize: AppSizes.textBase,
                         ),
                       ),
                     ),
-                    const SizedBox(width: 4),
+                    const SizedBox(width: AppSizes.gap4),
                   ],
                 ),
               ),
@@ -239,8 +239,9 @@ class _AnimatedBannerState extends State<_AnimatedBanner>
   }
 
   String _fmtDuration(Duration d) {
-    if (d.inSeconds >= 1)
+    if (d.inSeconds >= 1) {
       return '${(d.inMilliseconds / 1000).toStringAsFixed(1)}s';
+    }
     return '${d.inMilliseconds}ms';
   }
 }
@@ -252,17 +253,20 @@ class _MethodBadge extends StatelessWidget {
   Widget build(BuildContext context) {
     final color = InspectorColors.methodColor(method);
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSizes.paddingSm - 2,
+        vertical: AppSizes.paddingXs / 2,
+      ),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.12),
-        borderRadius: BorderRadius.circular(5),
-        border: Border.all(color: color.withOpacity(0.4)),
+        color: color.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(AppSizes.radiusXs),
+        border: Border.all(color: color.withValues(alpha: 0.4)),
       ),
       child: Text(
         method.toUpperCase(),
         style: TextStyle(
           color: color,
-          fontSize: 10,
+          fontSize: AppSizes.textXs,
           fontWeight: FontWeight.w700,
           fontFamily: 'monospace',
         ),
@@ -278,10 +282,16 @@ class _StatusLabel extends StatelessWidget {
   final Color color;
   @override
   Widget build(BuildContext context) {
-    final label = error != null && code == null ? 'ERROR' : '${code ?? '???'}';
+    final label = error != null && code == null
+        ? AppStrings.statusErrorUpper
+        : '${code ?? AppStrings.statusUnknown}';
     return Text(
       label,
-      style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: color),
+      style: TextStyle(
+        fontSize: AppSizes.textMd,
+        fontWeight: FontWeight.w700,
+        color: color,
+      ),
     );
   }
 }

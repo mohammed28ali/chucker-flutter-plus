@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+
+import '../../../../core/core.dart';
 import '../chucker_flutter.dart';
 import '../inspector_settings.dart';
 
@@ -10,50 +12,60 @@ class InspectorSettingsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('Inspector Settings')),
+      appBar: AppBar(title: const Text(AppStrings.inspectorSettingsTitle)),
       body: ValueListenableBuilder<InspectorSettings>(
         valueListenable: ChuckerFlutterPlus.settings,
         builder: (context, s, _) => ListView(
           children: [
             // ── Notifications ────────────────────────────────────────────────
-            _SectionHeader('Notifications'),
+            const _SectionHeader(AppStrings.sectionNotifications),
             _SwitchTile(
-              title: 'In-app banner',
-              subtitle: 'Show a floating banner when a request completes.',
+              title: AppStrings.inAppBanner,
+              subtitle: AppStrings.inAppBannerSubtitle,
               value: s.inAppBanner,
-              onChanged: (v) => ChuckerFlutterPlus.settings.save(s.copyWith(inAppBanner: v)),
+              onChanged: (v) =>
+                  ChuckerFlutterPlus.settings.save(s.copyWith(inAppBanner: v)),
             ),
             _SwitchTile(
-              title: 'System notifications',
-              subtitle: 'Show OS-level notifications for requests.',
+              title: AppStrings.systemNotifications,
+              subtitle: AppStrings.systemNotificationsSubtitle,
               value: s.systemNotifications,
-              onChanged: (v) => ChuckerFlutterPlus.settings.save(s.copyWith(systemNotifications: v)),
+              onChanged: (v) => ChuckerFlutterPlus.settings.save(
+                s.copyWith(systemNotifications: v),
+              ),
             ),
             _SwitchTile(
-              title: 'Status bar while foreground',
-              subtitle: 'Also show system notifications when the app is in the foreground.',
+              title: AppStrings.statusBarWhileForeground,
+              subtitle: AppStrings.statusBarWhileForegroundSubtitle,
               value: s.statusBarWhileForeground,
               onChanged: (v) => ChuckerFlutterPlus.settings.save(
                 s.copyWith(statusBarWhileForeground: v),
               ),
             ),
             _SwitchTile(
-              title: 'Notify only on error',
-              subtitle: 'Only show notifications for failed requests (4xx/5xx/errors).',
+              title: AppStrings.notifyOnlyOnError,
+              subtitle: AppStrings.notifyOnlyOnErrorSubtitle,
               value: s.onlyErrors,
-              onChanged: (v) => ChuckerFlutterPlus.settings.save(s.copyWith(onlyErrors: v)),
+              onChanged: (v) =>
+                  ChuckerFlutterPlus.settings.save(s.copyWith(onlyErrors: v)),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSizes.paddingLg,
+                vertical: AppSizes.paddingXs,
+              ),
               child: Row(
                 children: [
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Banner duration', style: theme.textTheme.bodyLarge),
                         Text(
-                          'How long to show the in-app banner.',
+                          AppStrings.bannerDuration,
+                          style: theme.textTheme.bodyLarge,
+                        ),
+                        Text(
+                          AppStrings.bannerDurationSubtitle,
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: theme.colorScheme.onSurfaceVariant,
                           ),
@@ -64,7 +76,10 @@ class InspectorSettingsPage extends StatelessWidget {
                   DropdownButton<int>(
                     value: s.bannerDuration.inSeconds.clamp(1, 10),
                     items: const [1, 3, 5, 10]
-                        .map((v) => DropdownMenuItem(value: v, child: Text('$v s')))
+                        .map(
+                          (v) =>
+                              DropdownMenuItem(value: v, child: Text('$v s')),
+                        )
                         .toList(),
                     onChanged: (v) {
                       if (v != null) {
@@ -78,16 +93,22 @@ class InspectorSettingsPage extends StatelessWidget {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSizes.paddingLg,
+                vertical: AppSizes.paddingXs,
+              ),
               child: Row(
                 children: [
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Banner position', style: theme.textTheme.bodyLarge),
                         Text(
-                          'Where the in-app banner appears.',
+                          AppStrings.bannerPosition,
+                          style: theme.textTheme.bodyLarge,
+                        ),
+                        Text(
+                          AppStrings.bannerPositionSubtitle,
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: theme.colorScheme.onSurfaceVariant,
                           ),
@@ -101,13 +122,19 @@ class InspectorSettingsPage extends StatelessWidget {
                         .map(
                           (p) => DropdownMenuItem(
                             value: p,
-                            child: Text(p == BannerPosition.top ? 'Top' : 'Bottom'),
+                            child: Text(
+                              p == BannerPosition.top
+                                  ? AppStrings.positionTop
+                                  : AppStrings.positionBottom,
+                            ),
                           ),
                         )
                         .toList(),
                     onChanged: (p) {
                       if (p != null) {
-                        ChuckerFlutterPlus.settings.save(s.copyWith(bannerPosition: p));
+                        ChuckerFlutterPlus.settings.save(
+                          s.copyWith(bannerPosition: p),
+                        );
                       }
                     },
                   ),
@@ -116,19 +143,29 @@ class InspectorSettingsPage extends StatelessWidget {
             ),
 
             // ── Storage ──────────────────────────────────────────────────────
-            const Divider(height: 32, indent: 16, endIndent: 16),
-            _SectionHeader('Storage'),
+            const Divider(
+              height: AppSizes.gap32,
+              indent: AppSizes.paddingLg,
+              endIndent: AppSizes.paddingLg,
+            ),
+            const _SectionHeader(AppStrings.sectionStorage),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSizes.paddingLg,
+                vertical: AppSizes.paddingXs,
+              ),
               child: Row(
                 children: [
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Max log entries', style: theme.textTheme.bodyLarge),
                         Text(
-                          'Older entries are discarded when the limit is reached.',
+                          AppStrings.maxLogEntries,
+                          style: theme.textTheme.bodyLarge,
+                        ),
+                        Text(
+                          AppStrings.maxLogEntriesSubtitle,
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: theme.colorScheme.onSurfaceVariant,
                           ),
@@ -141,7 +178,9 @@ class InspectorSettingsPage extends StatelessWidget {
                         ? s.maximumEntries
                         : 100,
                     items: const [50, 100, 200, 500]
-                        .map((n) => DropdownMenuItem(value: n, child: Text('$n')))
+                        .map(
+                          (n) => DropdownMenuItem(value: n, child: Text('$n')),
+                        )
                         .toList(),
                     onChanged: (n) async {
                       if (n != null) {
@@ -157,10 +196,17 @@ class InspectorSettingsPage extends StatelessWidget {
             ),
 
             // ── Danger Zone ──────────────────────────────────────────────────
-            const Divider(height: 32, indent: 16, endIndent: 16),
-            _SectionHeader('Danger Zone'),
+            const Divider(
+              height: AppSizes.gap32,
+              indent: AppSizes.paddingLg,
+              endIndent: AppSizes.paddingLg,
+            ),
+            const _SectionHeader(AppStrings.sectionDangerZone),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSizes.paddingLg,
+                vertical: AppSizes.paddingSm,
+              ),
               child: OutlinedButton.icon(
                 style: OutlinedButton.styleFrom(
                   foregroundColor: theme.colorScheme.error,
@@ -168,11 +214,11 @@ class InspectorSettingsPage extends StatelessWidget {
                   minimumSize: const Size(double.infinity, 48),
                 ),
                 icon: const Icon(Icons.delete_forever_outlined),
-                label: const Text('Clear all captured requests'),
+                label: const Text(AppStrings.clearAllCapturedRequests),
                 onPressed: () => _confirmClear(context),
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: AppSizes.gap24),
           ],
         ),
       ),
@@ -183,19 +229,19 @@ class InspectorSettingsPage extends StatelessWidget {
     final ok = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('Clear all logs?'),
-        content: const Text('This will permanently remove all captured requests.'),
+        title: const Text(AppStrings.clearLogsTitle),
+        content: const Text(AppStrings.clearLogsMessage),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
+            child: const Text(AppStrings.cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
             style: FilledButton.styleFrom(
               backgroundColor: Theme.of(context).colorScheme.error,
             ),
-            child: const Text('Clear'),
+            child: const Text(AppStrings.clear),
           ),
         ],
       ),
@@ -205,7 +251,7 @@ class InspectorSettingsPage extends StatelessWidget {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('All logs cleared'),
+            content: Text(AppStrings.allLogsCleared),
             duration: Duration(seconds: 2),
           ),
         );
@@ -217,11 +263,17 @@ class InspectorSettingsPage extends StatelessWidget {
 class _SectionHeader extends StatelessWidget {
   const _SectionHeader(this.title);
   final String title;
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
+      padding: const EdgeInsets.fromLTRB(
+        AppSizes.paddingLg,
+        AppSizes.paddingLg,
+        AppSizes.paddingLg,
+        AppSizes.paddingXs,
+      ),
       child: Text(
         title.toUpperCase(),
         style: theme.textTheme.labelSmall?.copyWith(
@@ -244,6 +296,7 @@ class _SwitchTile extends StatelessWidget {
   final String title, subtitle;
   final bool value;
   final ValueChanged<bool> onChanged;
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);

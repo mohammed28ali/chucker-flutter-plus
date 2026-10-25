@@ -68,7 +68,9 @@ class ChuckerFlutterPlus {
       enableOnRelease: enableOnRelease,
       redactHeaders: redactHeaders,
     );
-    if (navigatorKey?.currentContext case final context?) _banner.bind(context);
+    if (navigatorKey?.currentContext case final context? when context.mounted) {
+      _banner.bind(context);
+    }
     showNotification = enableNotifications;
     ChuckerFlutterPlus.notificationChannelName = notificationChannelName;
     if (enableNotifications) {

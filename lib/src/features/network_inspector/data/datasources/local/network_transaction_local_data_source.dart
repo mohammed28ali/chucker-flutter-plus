@@ -29,8 +29,9 @@ class NetworkTransactionLocalDataSource {
       }
       ChuckerHive.markInitialized();
     }
-    if (!Hive.isAdapterRegistered(typeId))
+    if (!Hive.isAdapterRegistered(typeId)) {
       Hive.registerAdapter(_RequestLogAdapter(typeId));
+    }
     return _box ??= await Hive.openLazyBox<NetworkTransactionModel>(
       boxName,
       encryptionCipher: encryptionKey == null
@@ -80,14 +81,15 @@ class NetworkTransactionLocalDataSource {
   }
 
   (String?, bool) _cap(String? value) {
-    if (value == null || utf8.encode(value).length <= maximumBodyBytes)
+    if (value == null || utf8.encode(value).length <= maximumBodyBytes) {
       return (value, false);
+    }
     return (value.substring(0, value.length.clamp(0, maximumBodyBytes)), true);
   }
 }
 
 class _RequestLogAdapter extends TypeAdapter<NetworkTransactionModel> {
-  _RequestLogAdapter(this.typeId);
+  const _RequestLogAdapter(this.typeId);
   @override
   final int typeId;
   @override

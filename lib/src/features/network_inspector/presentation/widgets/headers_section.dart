@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import '../../domain/entities/network_transaction.dart';
+
+import '../../../../core/core.dart';
 import 'key_value_row.dart';
 import 'section_card.dart';
 
@@ -31,9 +31,12 @@ class _HeadersSectionState extends State<HeadersSection> {
       return SectionCard(
         title: widget.title,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSizes.paddingLg,
+            vertical: AppSizes.paddingSm,
+          ),
           child: Text(
-            'No headers',
+            AppStrings.noHeaders,
             style: TextStyle(
               color: Theme.of(context).colorScheme.onSurfaceVariant,
               fontStyle: FontStyle.italic,
@@ -43,15 +46,16 @@ class _HeadersSectionState extends State<HeadersSection> {
       );
     }
 
-    final filtered = widget.headers.entries
-        .where(
-          (e) =>
-              _query.isEmpty ||
-              e.key.toLowerCase().contains(_query.toLowerCase()) ||
-              e.value.toLowerCase().contains(_query.toLowerCase()),
-        )
-        .toList()
-      ..sort((a, b) => a.key.compareTo(b.key));
+    final filtered =
+        widget.headers.entries
+            .where(
+              (e) =>
+                  _query.isEmpty ||
+                  e.key.toLowerCase().contains(_query.toLowerCase()) ||
+                  e.value.toLowerCase().contains(_query.toLowerCase()),
+            )
+            .toList()
+          ..sort((a, b) => a.key.compareTo(b.key));
 
     return SectionCard(
       title: widget.title,
@@ -61,17 +65,17 @@ class _HeadersSectionState extends State<HeadersSection> {
           Text(
             '${widget.headers.length}',
             style: TextStyle(
-              fontSize: 12,
+              fontSize: AppSizes.textMd,
               color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
           ),
           IconButton(
             icon: Icon(
               _expanded ? Icons.expand_less : Icons.expand_more,
-              size: 20,
+              size: AppSizes.iconLg,
             ),
             onPressed: () => setState(() => _expanded = !_expanded),
-            tooltip: _expanded ? 'Collapse' : 'Expand',
+            tooltip: _expanded ? AppStrings.collapse : AppStrings.expand,
           ),
         ],
       ),
@@ -82,43 +86,47 @@ class _HeadersSectionState extends State<HeadersSection> {
           children: [
             if (widget.headers.length > 4)
               Padding(
-                padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                padding: const EdgeInsets.fromLTRB(
+                  AppSizes.paddingLg,
+                  AppSizes.paddingSm,
+                  AppSizes.paddingLg,
+                  AppSizes.paddingSm,
+                ),
                 child: TextField(
                   decoration: const InputDecoration(
-                    prefixIcon: Icon(Icons.search, size: 18),
-                    hintText: 'Search headers',
+                    prefixIcon: Icon(Icons.search, size: AppSizes.icon18),
+                    hintText: AppStrings.searchHeaders,
                     isDense: true,
                   ),
                   onChanged: (v) => setState(() => _query = v),
                 ),
               ),
-            ...filtered.map(
-              (e) {
-                final isSensitive = widget.sensitiveKeys.contains(
-                  e.key.toLowerCase(),
-                );
-                final revealed = _revealed[e.key] ?? false;
-                return Column(
-                  children: [
-                    KeyValueRow(
-                      label: e.key,
-                      value: e.value,
-                      monospace: true,
-                      redacted: isSensitive && !revealed,
-                      onReveal: isSensitive && !revealed
-                          ? () => setState(() => _revealed[e.key] = true)
-                          : null,
-                    ),
-                    if (e != filtered.last) const KeyValueDivider(),
-                  ],
-                );
-              },
-            ),
-            const SizedBox(height: 8),
+            ...filtered.map((e) {
+              final isSensitive = widget.sensitiveKeys.contains(
+                e.key.toLowerCase(),
+              );
+              final revealed = _revealed[e.key] ?? false;
+              return Column(
+                children: [
+                  KeyValueRow(
+                    label: e.key,
+                    value: e.value,
+                    monospace: true,
+                    redacted: isSensitive && !revealed,
+                    onReveal: isSensitive && !revealed
+                        ? () => setState(() => _revealed[e.key] = true)
+                        : null,
+                  ),
+                  if (e != filtered.last) const KeyValueDivider(),
+                ],
+              );
+            }),
+            const SizedBox(height: AppSizes.gap8),
           ],
         ),
-        crossFadeState:
-            _expanded ? CrossFadeState.showSecond : CrossFadeState.showFirst,
+        crossFadeState: _expanded
+            ? CrossFadeState.showSecond
+            : CrossFadeState.showFirst,
         duration: const Duration(milliseconds: 200),
       ),
     );

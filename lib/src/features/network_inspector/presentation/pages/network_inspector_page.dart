@@ -1,17 +1,15 @@
 import 'package:chucker_flutter_plus/src/config/theme/inspector_colors.dart';
 import 'package:chucker_flutter_plus/src/core/core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../../../config/dependency_injection/chucker_dependencies.dart';
 import '../../domain/entities/network_transaction.dart';
 import '../chucker_flutter.dart';
-import '../inspector_settings.dart';
+import '../widgets/empty_state.dart';
 import '../widgets/method_chip.dart';
 import '../widgets/status_badge.dart';
 import '../widgets/summary_header.dart';
-import '../widgets/empty_state.dart';
 import 'request_detail_page.dart';
 import 'settings_page.dart';
 
@@ -40,8 +38,8 @@ class _NetworkInspectorPageState extends State<NetworkInspectorPage> {
   late Future<List<NetworkTransaction>> _future;
   final _searchCtrl = TextEditingController();
   String _query = '';
-  String _methodFilter = 'All';
-  String _statusFilter = 'All'; // 'All', '2', '3', '4', '5', 'Error'
+  String _methodFilter = AppStrings.filterAll;
+  String _statusFilter = AppStrings.filterAll; // 'All', '2', '3', '4', '5', 'Error'
   bool _errorsOnly = false;
   _SortMode _sort = _SortMode.newest;
   bool _openedInitial = false;
@@ -99,10 +97,11 @@ class _NetworkInspectorPageState extends State<NetworkInspectorPage> {
           t.method.toLowerCase().contains(q) ||
           '${t.statusCode}'.contains(q) ||
           (t.rawResponseBody?.toLowerCase().contains(q) ?? false);
-      final matchesMethod = _methodFilter == 'All' || t.method == _methodFilter;
+      final matchesMethod =
+          _methodFilter == AppStrings.filterAll || t.method == _methodFilter;
       final matchesStatus =
-          _statusFilter == 'All' ||
-          (_statusFilter == 'Error' && t.error != null) ||
+          _statusFilter == AppStrings.filterAll ||
+          (_statusFilter == AppStrings.filterError && t.error != null) ||
           '${t.statusCode ?? 0}'.startsWith(_statusFilter);
       final matchesErrors = !_errorsOnly || !t.succeeded;
       return matchesQuery && matchesMethod && matchesStatus && matchesErrors;
@@ -121,8 +120,10 @@ class _NetworkInspectorPageState extends State<NetworkInspectorPage> {
   void _openDetail(BuildContext context, NetworkTransaction t) {
     Navigator.of(context).push(
       PageRouteBuilder(
-        pageBuilder: (_, animation, __) => RequestDetailPage(transaction: t),
-        transitionsBuilder: (_, anim, __, child) => SlideTransition(
+        pageBuilder: (context, animation, secondaryAnimation) =>
+            RequestDetailPage(transaction: t),
+        transitionsBuilder: (context, anim, secondaryAnim, child) =>
+            SlideTransition(
           position: Tween<Offset>(begin: const Offset(1, 0), end: Offset.zero)
               .animate(
                 CurvedAnimation(parent: anim, curve: Curves.easeInOutCubic),
@@ -336,28 +337,33 @@ class _FiltersRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final methods = {'All', ...all.map((t) => t.method)};
+    final methods = {AppStrings.filterAll, ...all.map((t) => t.method)};
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSizes.paddingMd,
+        vertical: AppSizes.paddingSm,
+      ),
       child: Row(
         children: [
           // Method chips
           ...methods.map(
             (m) => Padding(
-              padding: const EdgeInsets.only(right: 6),
+              padding: const EdgeInsets.only(right: AppSizes.gap6),
               child: _FilterChip(
                 label: m,
                 selected: methodFilter == m,
-                color: m == 'All' ? null : InspectorColors.methodColor(m),
+                color: m == AppStrings.filterAll
+                    ? null
+                    : InspectorColors.methodColor(m),
                 onSelected: () => onMethodChanged(m),
               ),
             ),
           ),
-          const SizedBox(width: 4),
+          const SizedBox(width: AppSizes.gap4),
           // Status group chips
           ...[
-            ('All', null),
+            (AppStrings.filterAll, null),
             ('2xx', InspectorColors.status2xx),
             ('3xx', InspectorColors.status3xx),
             ('4xx', InspectorColors.status4xx),
@@ -365,9 +371,9 @@ class _FiltersRow extends StatelessWidget {
           ].map((entry) {
             final label = entry.$1;
             final color = entry.$2;
-            final key = label == 'All' ? 'All' : label[0];
+            final key = label == AppStrings.filterAll ? AppStrings.filterAll : label[0];
             return Padding(
-              padding: const EdgeInsets.only(right: 6),
+              padding: const EdgeInsets.only(right: AppSizes.gap6),
               child: _FilterChip(
                 label: label,
                 selected: statusFilter == key,
@@ -376,19 +382,19 @@ class _FiltersRow extends StatelessWidget {
               ),
             );
           }),
-          const SizedBox(width: 4),
+          const SizedBox(width: AppSizes.gap4),
           // Errors only toggle
           Padding(
-            padding: const EdgeInsets.only(right: 6),
+            padding: const EdgeInsets.only(right: AppSizes.gap6),
             child: _FilterChip(
-              label: 'Errors only',
+              label: AppStrings.filterErrorsOnly,
               selected: errorsOnly,
               color: InspectorColors.statusError,
               icon: Icons.error_outline,
               onSelected: () => onErrorsOnlyChanged(!errorsOnly),
             ),
           ),
-          const SizedBox(width: 4),
+          const SizedBox(width: AppSizes.gap4),
           // Sort
           _SortChip(current: sort, onChanged: onSortChanged),
         ],
@@ -419,10 +425,13 @@ class _FilterChip extends StatelessWidget {
       onTap: onSelected,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 150),
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSizes.paddingSm + 2,
+          vertical: AppSizes.paddingXs + 1,
+        ),
         decoration: BoxDecoration(
           color: selected
-              ? c.withOpacity(0.15)
+              ? c.withValues(alpha: 0.15)
               : theme.colorScheme.surfaceContainerLow,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
@@ -557,7 +566,7 @@ class _TransactionTile extends StatelessWidget {
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 150),
           color: selected
-              ? theme.colorScheme.primaryContainer.withOpacity(0.5)
+              ? theme.colorScheme.primaryContainer.withValues(alpha: 0.5)
               : Colors.transparent,
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
@@ -660,8 +669,9 @@ class _TransactionTile extends StatelessWidget {
   }
 
   String _formatDuration(Duration d) {
-    if (d.inSeconds >= 1)
+    if (d.inSeconds >= 1) {
       return '${(d.inMilliseconds / 1000).toStringAsFixed(1)}s';
+    }
     return '${d.inMilliseconds}ms';
   }
 

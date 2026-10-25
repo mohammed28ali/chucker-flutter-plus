@@ -106,9 +106,6 @@ class AppText extends StatelessWidget {
   final bool? softWrap;
   final _Variant _variant;
 
-  // ignore: prefer_final_fields
-  static const _Variant _defaultVariant = _Variant.body;
-
   // ── Build ────────────────────────────────────────────────────────────────
 
   @override

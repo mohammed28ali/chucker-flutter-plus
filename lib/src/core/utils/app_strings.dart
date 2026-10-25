@@ -13,6 +13,7 @@ abstract final class AppStrings {
   // ── App bar / titles ─────────────────────────────────────────────────────
   static const String networkInspectorTitle = 'Network Inspector';
   static const String settingsTitle = 'Settings';
+  static const String inspectorSettingsTitle = 'Inspector Settings';
   static const String requestDetailTitle = 'Request Detail';
 
   // ── Action labels ─────────────────────────────────────────────────────────
@@ -22,13 +23,20 @@ abstract final class AppStrings {
   static const String settings = 'Settings';
   static const String exportLogs = 'Export logs';
   static const String clearAll = 'Clear all';
+  static const String clear = 'Clear';
   static const String cancel = 'Cancel';
   static const String details = 'Details';
   static const String reveal = 'reveal';
+  static const String copy = 'Copy';
+  static const String wordWrap = 'Word wrap';
+  static const String lineNumbers = 'Line numbers';
+  static const String collapse = 'Collapse';
+  static const String expand = 'Expand';
 
-  // ── Popup / menu ─────────────────────────────────────────────────────────
+  // ── Popup / menu / share ──────────────────────────────────────────────────
   static const String copyCurl = 'Copy cURL';
   static const String copyUrl = 'Copy URL';
+  static const String shareAsCurl = 'Share as cURL';
   static const String shareAsJson = 'Share as JSON';
   static const String newestFirst = 'Newest first';
   static const String slowestFirst = 'Slowest first';
@@ -48,11 +56,14 @@ abstract final class AppStrings {
   static const String curlCopied = 'cURL copied';
   static const String urlCopied = 'URL copied';
   static const String copiedToClipboard = 'Copied to clipboard';
+  static const String bodyCopied = 'Body copied to clipboard';
+  static const String allLogsCleared = 'All logs cleared';
 
   // ── Clear dialog ──────────────────────────────────────────────────────────
   static const String clearLogsTitle = 'Clear all logs?';
   static const String clearLogsMessage =
       'This will permanently remove all captured requests.';
+  static const String clearAllCapturedRequests = 'Clear all captured requests';
 
   // ── Empty state ───────────────────────────────────────────────────────────
   static const String emptyNoRequests = 'No requests yet';
@@ -61,9 +72,14 @@ abstract final class AppStrings {
       'Make an HTTP request through a\nconfigured Dio or http client to\nsee it appear here.';
   static const String emptyNoMatchesSubtitle =
       'Try adjusting your search or filters.';
+  static const String noHeaders = 'No headers';
+  static const String searchHeaders = 'Search headers';
+  static const String noBody = 'No body';
+  static const String emptyFormData = '(empty form data)';
 
   // ── Status badge labels ───────────────────────────────────────────────────
   static const String statusErr = 'ERR';
+  static const String statusErrorUpper = 'ERROR';
   static const String statusUnknown = '???';
   static const String statusPending = 'pending';
   static const String statusNetworkError = 'Network Error';
@@ -89,6 +105,14 @@ abstract final class AppStrings {
   static const String status503 = '503 Service Unavailable';
   static const String status504 = '504 Gateway Timeout';
 
+  // ── Tabs ──────────────────────────────────────────────────────────────────
+  static const String tabOverview = 'Overview';
+  static const String tabRequest = 'Request';
+  static const String tabResponse = 'Response';
+  static const String tabRaw = 'Raw';
+  static const String tabError = 'Error';
+  static const String tabMedia = 'Media';
+
   // ── Body viewer labels ────────────────────────────────────────────────────
   static const String bodyViewTree = 'Tree';
   static const String bodyViewPretty = 'Pretty';
@@ -97,16 +121,38 @@ abstract final class AppStrings {
   static const String requestBodyLabel = 'Request Body';
   static const String responseBodyLabel = 'Response Body';
   static const String rawPayloads = 'Raw Payloads';
+  static const String bodyTruncatedWarning =
+      'Body truncated — full body was too large to capture.';
+  static const String items = 'items';
+  static const String key = 'Key';
+  static const String value = 'Value';
 
-  // ── Key-value / overview labels ───────────────────────────────────────────
+  // ── Key-value / overview / detail labels ──────────────────────────────────
+  static const String labelGeneral = 'General';
   static const String labelUrl = 'URL';
   static const String labelMethod = 'Method';
   static const String labelStatus = 'Status';
+  static const String labelHost = 'Host';
+  static const String labelPath = 'Path';
+  static const String labelQuery = 'Query';
+  static const String labelContentType = 'Content-Type';
+  static const String labelRequestSize = 'Request size';
+  static const String labelResponseSize = 'Response size';
   static const String labelDuration = 'Duration';
+  static const String labelStarted = 'Started';
+  static const String labelCompleted = 'Completed';
+  static const String labelRequestBody = 'Request body';
+  static const String labelResponseBody = 'Response body';
+  static const String labelTruncated = 'Truncated';
   static const String labelSize = 'Size';
   static const String labelDimensions = 'Dimensions';
   static const String labelRequestHeaders = 'Request Headers';
   static const String labelResponseHeaders = 'Response Headers';
+  static const String labelFormatted = 'Formatted';
+  static const String labelType = 'Type';
+  static const String labelStackTrace = 'Stack Trace';
+  static const String labelMediaInfo = 'Media Info';
+  static const String labelPreview = 'Preview';
 
   // ── Summary header labels ─────────────────────────────────────────────────
   static const String statTotal = 'Total';
@@ -124,10 +170,43 @@ abstract final class AppStrings {
   // ── Media / image tab ────────────────────────────────────────────────────
   static const String previewNotAvailable = 'Preview not available';
 
-  // ── Error banner messages ─────────────────────────────────────────────────
+  // ── Error messages & hints ────────────────────────────────────────────────
   static const String errorTimeout =
-      'Request timed out. The server took too long to respond.';
-  static const String errorSslPrefix = 'SSL/TLS error: ';
+      'Timeout: the server did not respond in time. Check your network connection or increase the timeout setting.';
+  static const String errorConnRefused =
+      'Connection refused: the server actively rejected the connection. Check if the server is running and the port is correct.';
+  static const String errorSsl =
+      'SSL/TLS error: certificate verification failed. The server may have an invalid or self-signed certificate.';
   static const String errorNetworkUnreachable =
       'Network unreachable: no route to host. Check your network connection.';
+
+  // ── Settings ──────────────────────────────────────────────────────────────
+  static const String sectionNotifications = 'Notifications';
+  static const String inAppBanner = 'In-app banner';
+  static const String inAppBannerSubtitle =
+      'Show a floating banner when a request completes.';
+  static const String systemNotifications = 'System notifications';
+  static const String systemNotificationsSubtitle =
+      'Show OS-level notifications for requests.';
+  static const String statusBarWhileForeground = 'Status bar while foreground';
+  static const String statusBarWhileForegroundSubtitle =
+      'Also show system notifications when the app is in the foreground.';
+  static const String notifyOnlyOnError = 'Notify only on error';
+  static const String notifyOnlyOnErrorSubtitle =
+      'Only show notifications for failed requests (4xx/5xx/errors).';
+  static const String bannerDuration = 'Banner duration';
+  static const String bannerDurationSubtitle =
+      'How long to show the in-app banner.';
+  static const String bannerPosition = 'Banner position';
+  static const String bannerPositionSubtitle =
+      'Where the in-app banner appears.';
+  static const String positionTop = 'Top';
+  static const String positionBottom = 'Bottom';
+
+  static const String sectionStorage = 'Storage';
+  static const String maxLogEntries = 'Max log entries';
+  static const String maxLogEntriesSubtitle =
+      'Older entries are discarded when the limit is reached.';
+
+  static const String sectionDangerZone = 'Danger Zone';
 }
