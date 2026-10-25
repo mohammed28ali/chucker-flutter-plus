@@ -1,62 +1,97 @@
 import 'package:flutter/material.dart';
 
 abstract final class InspectorColors {
-  // ── Brand seed ──────────────────────────────────────────────────
-  static const Color seed = Color(0xFF4F6AF5);
+  static const Color seed = Color(0xFF0891F2);
+  static const Color seedAccent = Color(0xFF22D3EE);
+
+  static const Color brandNavy = Color(0xFF0B1428);
+  static const Color brandBlue = Color(0xFF008DFF);
+  static const Color brandCyan = Color(0xFF22D3EE);
+
+  static const LinearGradient brandGradient = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [Color(0xFF22D3EE), Color(0xFF0891F2), Color(0xFF0066FF)],
+  );
 
   // ── Method chips ────────────────────────────────────────────────
-  static const Color get_ = Color(0xFF1E88E5);
-  static const Color post = Color(0xFF43A047);
-  static const Color put = Color(0xFFFB8C00);
-  static const Color patch = Color(0xFF8E24AA);
-  static const Color delete = Color(0xFFE53935);
-  static const Color head = Color(0xFF00ACC1);
-  static const Color options = Color(0xFF6D4C41);
-  static const Color other = Color(0xFF546E7A);
+  static const Color get_ = Color(0xFF0284C7); // blue
+  static const Color post = Color(0xFF059669); // emerald
+  static const Color put = Color(0xFFD97706); // amber
+  static const Color patch = Color(0xFF9333EA); // violet
+  static const Color delete = Color(0xFFDC2626); // red
+  static const Color head = Color(0xFF0891B2); // cyan
+  static const Color options = Color(0xFF4F46E5); // indigo
+  static const Color other = Color(0xFF64748B); // slate
 
-  // ── Status code groups ──────────────────────────────────────────
-  static const Color status2xx = Color(0xFF2E7D32);
-  static const Color status2xxBg = Color(0xFFE8F5E9);
-  static const Color status3xx = Color(0xFF1565C0);
-  static const Color status3xxBg = Color(0xFFE3F2FD);
-  static const Color status4xx = Color(0xFFE65100);
-  static const Color status4xxBg = Color(0xFFFFF3E0);
-  static const Color status5xx = Color(0xFFC62828);
-  static const Color status5xxBg = Color(0xFFFFEBEE);
-  static const Color statusError = Color(0xFFB71C1C);
-  static const Color statusErrorBg = Color(0xFFFFEBEE);
-  static const Color statusPending = Color(0xFF546E7A);
-  static const Color statusPendingBg = Color(0xFFECEFF1);
+  // ── Status code groups (light) ──────────────────────────────────
+  static const Color status2xx = Color(0xFF059669);
+  static const Color status2xxBg = Color(0xFFD1FAE5);
 
-  // ── Dark variants (lighter for dark bg) ─────────────────────────
-  static const Color status2xxDark = Color(0xFF66BB6A);
-  static const Color status2xxBgDark = Color(0xFF1B5E20);
-  static const Color status3xxDark = Color(0xFF42A5F5);
-  static const Color status3xxBgDark = Color(0xFF0D47A1);
-  static const Color status4xxDark = Color(0xFFFF9800);
-  static const Color status4xxBgDark = Color(0xFFE65100);
-  static const Color status5xxDark = Color(0xFFEF5350);
-  static const Color status5xxBgDark = Color(0xFFB71C1C);
+  static const Color status3xx = Color(0xFF2563EB);
+  static const Color status3xxBg = Color(0xFFDBEAFE);
 
-  // ── JSON syntax ─────────────────────────────────────────────────
-  static const Color jsonString = Color(0xFF388E3C);
-  static const Color jsonNumber = Color(0xFF1976D2);
-  static const Color jsonBool = Color(0xFF7B1FA2);
-  static const Color jsonNull = Color(0xFF9E9E9E);
-  static const Color jsonKey = Color(0xFFBF360C);
-  static const Color jsonStringDark = Color(0xFF81C784);
-  static const Color jsonNumberDark = Color(0xFF64B5F6);
-  static const Color jsonBoolDark = Color(0xFFCE93D8);
-  static const Color jsonNullDark = Color(0xFF757575);
-  static const Color jsonKeyDark = Color(0xFFFFAB91);
+  static const Color status4xx = Color(0xFFD97706);
+  static const Color status4xxBg = Color(0xFFFEF3C7);
 
-  // ── Surface / overlay tones ──────────────────────────────────────
-  static const Color surface = Color(0xFFF8F9FF);
-  static const Color surfaceDark = Color(0xFF111318);
+  static const Color status5xx = Color(0xFFDC2626);
+  static const Color status5xxBg = Color(0xFFFEE2E2);
+
+  static const Color statusError = Color(0xFFBE123C);
+  static const Color statusErrorBg = Color(0xFFFFE4E6);
+
+  static const Color statusPending = Color(0xFF64748B);
+  static const Color statusPendingBg = Color(0xFFF1F5F9);
+
+  // ── Status code groups (dark) ──────────────────────────────────
+  static const Color status2xxDark = Color(0xFF34D399);
+  static const Color status2xxBgDark = Color(0xFF064E3B);
+
+  static const Color status3xxDark = Color(0xFF60A5FA);
+  static const Color status3xxBgDark = Color(0xFF172554);
+
+  static const Color status4xxDark = Color(0xFFFBBF24);
+  static const Color status4xxBgDark = Color(0xFF78350F);
+
+  static const Color status5xxDark = Color(0xFFFB7185);
+  static const Color status5xxBgDark = Color(0xFF881337);
+
+  static const Color statusErrorDark = Color(0xFFFDA4AF);
+  static const Color statusErrorBgDark = Color(0xFF4C0519);
+
+  // ── JSON syntax (light) ─────────────────────────────────────────
+  static const Color jsonString = Color(0xFF059669);
+  static const Color jsonNumber = Color(0xFF0284C7);
+  static const Color jsonBool = Color(0xFFD97706);
+  static const Color jsonNull = Color(0xFF64748B);
+  static const Color jsonKey = Color(0xFF7C3AED);
+
+  // ── JSON syntax (dark) ──────────────────────────────────────────
+  static const Color jsonStringDark = Color(0xFF6EE7B7);
+  static const Color jsonNumberDark = Color(0xFF38BDF8);
+  static const Color jsonBoolDark = Color(0xFFFCD34D);
+  static const Color jsonNullDark = Color(0xFF94A3B8);
+  static const Color jsonKeyDark = Color(0xFFC4B5FD);
+
+  // ── Surface / overlay tones (light) ─────────────────────────────
+  static const Color surface = Color(0xFFF4F8FF);
   static const Color cardLight = Color(0xFFFFFFFF);
-  static const Color cardDark = Color(0xFF1E2128);
-  static const Color dividerLight = Color(0xFFE0E0E0);
-  static const Color dividerDark = Color(0xFF2A2D35);
+  static const Color dividerLight = Color(0xFFDFE7F2);
+
+  // ── Surface / overlay tones (dark) ──────────────────────────────
+  static const Color surfaceDark = Color(0xFF0B1428);
+  static const Color cardDark = Color(0xFF111D35);
+  static const Color dividerDark = Color(0xFF263650);
+
+  // ── Brand-specific surfaces ─────────────────────────────────────
+  static const Color primaryLight = Color(0xFF007BFF);
+  static const Color primaryDark = Color(0xFF38BDF8);
+
+  static const Color accentLight = Color(0xFF0891B2);
+  static const Color accentDark = Color(0xFF22D3EE);
+
+  static const Color brandTintLight = Color(0xFFE0F2FE);
+  static const Color brandTintDark = Color(0xFF102D4D);
 
   // ── Helpers ─────────────────────────────────────────────────────
   static Color methodColor(String method) => switch (method.toUpperCase()) {
@@ -72,17 +107,23 @@ abstract final class InspectorColors {
 
   static (Color fg, Color bg) statusColors(int? code, {required bool dark}) {
     if (code == null) {
-      return dark ? (statusError, statusErrorBg) : (statusError, statusErrorBg);
+      return dark
+          ? (statusErrorDark, statusErrorBgDark)
+          : (statusError, statusErrorBg);
     }
+
     if (code < 300) {
       return dark ? (status2xxDark, status2xxBgDark) : (status2xx, status2xxBg);
     }
+
     if (code < 400) {
       return dark ? (status3xxDark, status3xxBgDark) : (status3xx, status3xxBg);
     }
+
     if (code < 500) {
       return dark ? (status4xxDark, status4xxBgDark) : (status4xx, status4xxBg);
     }
+
     return dark ? (status5xxDark, status5xxBgDark) : (status5xx, status5xxBg);
   }
 }
