@@ -8,4 +8,4 @@ library;
 
 export 'utils/app_sizes.dart';
 export 'utils/app_strings.dart';
-export 'widgets/app_text.dart';
+export 'shared_widgets/app_text.dart';
