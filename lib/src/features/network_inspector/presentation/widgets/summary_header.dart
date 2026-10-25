@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+
 import '../../domain/entities/network_transaction.dart';
 import 'method_chip.dart';
 import 'status_badge.dart';
-import '../theme/inspector_colors.dart';
+import '../../../../config/theme/inspector_colors.dart';
 
 /// Summary header showing aggregate stats about all captured requests.
 class SummaryHeader extends StatelessWidget {
@@ -20,9 +21,9 @@ class SummaryHeader extends StatelessWidget {
     final avgMs = total == 0
         ? 0
         : transactions
-                .map((t) => t.duration.inMilliseconds)
-                .reduce((a, b) => a + b) ~/
-            total;
+                  .map((t) => t.duration.inMilliseconds)
+                  .reduce((a, b) => a + b) ~/
+              total;
     final totalBytes = transactions
         .map((t) => t.responseBodySize)
         .fold<int>(0, (a, b) => a + b);
@@ -33,10 +34,7 @@ class SummaryHeader extends StatelessWidget {
       decoration: BoxDecoration(
         color: theme.colorScheme.surfaceContainerLow,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: theme.colorScheme.outlineVariant,
-          width: 1,
-        ),
+        border: Border.all(color: theme.colorScheme.outlineVariant, width: 1),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -83,11 +81,7 @@ class SummaryHeader extends StatelessWidget {
         const SizedBox(height: 4),
         Text(
           value,
-          style: TextStyle(
-            fontSize: 13,
-            fontWeight: FontWeight.w700,
-            color: c,
-          ),
+          style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: c),
         ),
         Text(
           label,
@@ -101,16 +95,16 @@ class SummaryHeader extends StatelessWidget {
   }
 
   Widget _divider(BuildContext context) => Container(
-        height: 30,
-        width: 1,
-        color: Theme.of(context).colorScheme.outlineVariant,
-      );
+    height: 30,
+    width: 1,
+    color: Theme.of(context).colorScheme.outlineVariant,
+  );
 
   static String _size(int bytes) => bytes < 1024
       ? '$bytes B'
       : bytes < 1024 * 1024
-          ? '${(bytes / 1024).toStringAsFixed(1)} KB'
-          : '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
+      ? '${(bytes / 1024).toStringAsFixed(1)} KB'
+      : '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
 }
 
 /// The method + status breakdown bar shown below the summary.

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../theme/inspector_colors.dart';
+
+import '../../../../config/theme/inspector_colors.dart';
 
 /// Color-coded chip showing the HTTP method.
 class MethodChip extends StatelessWidget {

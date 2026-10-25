@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
-import '../theme/inspector_colors.dart';
+
+import '../../../../config/theme/inspector_colors.dart';
 
 /// Badge showing an HTTP status code, color-coded by group.
 /// Tapping shows a tooltip with the status meaning.
 class StatusBadge extends StatelessWidget {
-  const StatusBadge(this.statusCode, {super.key, this.error, this.small = false});
+  const StatusBadge(
+    this.statusCode, {
+    super.key,
+    this.error,
+    this.small = false,
+  });
   final int? statusCode;
   final String? error;
   final bool small;
