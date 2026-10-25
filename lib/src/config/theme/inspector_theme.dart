@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 
 import 'inspector_colors.dart';
 
-/// Self-contained Material 3 ThemeData for the Chucker inspector.
-/// Must NOT be mixed with or inherit from the host app theme.
 abstract final class InspectorTheme {
   static ThemeData light() => _build(Brightness.light);
   static ThemeData dark() => _build(Brightness.dark);
