@@ -23,6 +23,11 @@ class ChuckerFlutterPlus {
     'cookie',
     'set-cookie',
   };
+  static final GlobalKey<NavigatorState> navigatorKey =
+      GlobalKey<NavigatorState>();
+  static final NavigatorObserver navigatorObserver =
+      _ChuckerNavigatorObserver();
+
   static ChuckerDependencies _dependencies = ChuckerDependencies.create();
   static ChuckerDependencies get dependencies => _dependencies;
   static OverlayEntry? _entry;
@@ -69,7 +74,8 @@ class ChuckerFlutterPlus {
       enableOnRelease: enableOnRelease,
       redactHeaders: redactHeaders,
     );
-    if (navigatorKey?.currentContext case final context? when context.mounted) {
+    final effectiveNavKey = navigatorKey ?? ChuckerFlutterPlus.navigatorKey;
+    if (effectiveNavKey.currentContext case final context? when context.mounted) {
       _banner.bind(context);
     }
     showNotification = enableNotifications;
@@ -77,8 +83,8 @@ class ChuckerFlutterPlus {
     if (enableNotifications) {
       _notifications = ChuckerNotificationService(
         onRequestSelected: (id) {
-          final context = navigatorKey?.currentContext;
-          if (context != null) showInspector(context, requestId: id);
+          final context = effectiveNavKey.currentContext ?? _banner.context;
+          if (context != null) showInspector(context, id);
         },
         onUnrecognizedPayload: onUnrecognizedNotificationPayload,
       );
@@ -115,16 +121,28 @@ class ChuckerFlutterPlus {
   static Map<String, String> redactHeaders(Map<String, String> headers) =>
       BodyCapture.redact(headers, sensitiveHeaders);
 
-  static void showInspector(BuildContext context, {String? requestId}) {
+  static void showChuckerScreen([BuildContext? context]) =>
+      showInspector(context);
+
+  static void showInspector([BuildContext? context, String? requestId]) {
+    final ctx = context ?? navigatorKey.currentContext ?? _banner.context;
+    if (ctx == null) {
+      if (!isEnabled || _entry != null) return;
+      throw StateError(
+        'showInspector requires a BuildContext below an Overlay, or set '
+        'navigatorKey: ChuckerFlutterPlus.navigatorKey or '
+        'navigatorObservers: [ChuckerFlutterPlus.navigatorObserver] in MaterialApp.',
+      );
+    }
     if (!isEnabled || _entry != null) return;
-    final overlay = Overlay.maybeOf(context, rootOverlay: true);
+    final overlay = Overlay.maybeOf(ctx, rootOverlay: true);
     if (overlay == null) {
       throw StateError('showInspector requires a context below an Overlay.');
     }
-    _banner.bind(context);
+    _banner.bind(ctx);
     // Capture system brightness at show-time; the inspector has its own theme.
     final brightness =
-        MediaQuery.maybePlatformBrightnessOf(context) ?? Brightness.light;
+        MediaQuery.maybePlatformBrightnessOf(ctx) ?? Brightness.light;
     _entry = OverlayEntry(
       builder: (_) => _IsolatedInspector(
         brightness: brightness,
@@ -160,10 +178,15 @@ class ChuckerFlutterPlus {
       settings: settings.value,
     );
     if (delivery == NotificationDelivery.inApp && canShow) {
+      if (_banner.context == null || !_banner.context!.mounted) {
+        if (navigatorKey.currentContext case final ctx? when ctx.mounted) {
+          _banner.bind(ctx);
+        }
+      }
       _banner.show(transaction, settings.value, () {
         _banner.dismiss();
-        final context = _banner.context;
-        if (context != null) showInspector(context, requestId: transaction.id);
+        final context = _banner.context ?? navigatorKey.currentContext;
+        if (context != null) showInspector(context, transaction.id);
       });
     }
     if (delivery == NotificationDelivery.statusBar &&
@@ -298,3 +321,41 @@ class _IsolatedInspectorState extends State<_IsolatedInspector> {
     );
   }
 }
+
+class _ChuckerNavigatorObserver extends NavigatorObserver {
+  void _updateContext(Route<dynamic>? route) {
+    final context =
+        route?.navigator?.context ?? ChuckerFlutterPlus.navigatorKey.currentContext;
+    if (context != null && context.mounted) {
+      ChuckerFlutterPlus._banner.bind(context);
+    }
+  }
+
+  @override
+  void didPush(Route<dynamic> route, Route<dynamic>? previousRoute) {
+    super.didPush(route, previousRoute);
+    _updateContext(route);
+  }
+
+  @override
+  void didPop(Route<dynamic> route, Route<dynamic>? previousRoute) {
+    super.didPop(route, previousRoute);
+    _updateContext(previousRoute);
+  }
+
+  @override
+  void didReplace({Route<dynamic>? newRoute, Route<dynamic>? oldRoute}) {
+    super.didReplace(newRoute: newRoute, oldRoute: oldRoute);
+    _updateContext(newRoute);
+  }
+
+  @override
+  void didRemove(Route<dynamic> route, Route<dynamic>? previousRoute) {
+    super.didRemove(route, previousRoute);
+    _updateContext(previousRoute);
+  }
+}
+
+/// Alias for backwards compatibility with `chucker_flutter`.
+typedef ChuckerFlutter = ChuckerFlutterPlus;
+
