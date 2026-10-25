@@ -1,4 +1,5 @@
 import 'package:chucker_flutter_plus/src/config/theme/inspector_colors.dart';
+import 'package:chucker_flutter_plus/src/core/core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:share_plus/share_plus.dart';
@@ -66,21 +67,19 @@ class _NetworkInspectorPageState extends State<NetworkInspectorPage> {
     final ok = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('Clear all logs?'),
-        content: const Text(
-          'This will permanently remove all captured requests.',
-        ),
+        title: const Text(AppStrings.clearLogsTitle),
+        content: const Text(AppStrings.clearLogsMessage),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
+            child: const Text(AppStrings.cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
             style: FilledButton.styleFrom(
               backgroundColor: Theme.of(context).colorScheme.error,
             ),
-            child: const Text('Clear'),
+            child: const Text(AppStrings.clearAll),
           ),
         ],
       ),
@@ -250,26 +249,26 @@ class _NetworkInspectorPageState extends State<NetworkInspectorPage> {
     leading: widget.onClose != null
         ? IconButton(
             icon: const Icon(Icons.close),
-            tooltip: 'Close inspector',
+            tooltip: AppStrings.close,
             onPressed: widget.onClose,
           )
         : null,
-    title: const Text('Network Inspector'),
+    title: const Text(AppStrings.networkInspectorTitle),
     actions: [
       IconButton(
         icon: const Icon(Icons.refresh_rounded),
-        tooltip: 'Refresh',
+        tooltip: AppStrings.refresh,
         onPressed: _reload,
       ),
       PopupMenuButton<String>(
         icon: const Icon(Icons.more_vert),
-        tooltip: 'More options',
+        tooltip: AppStrings.moreOptions,
         itemBuilder: (_) => [
-          const PopupMenuItem(value: 'settings', child: Text('Settings')),
-          const PopupMenuItem(value: 'export', child: Text('Export logs')),
+          const PopupMenuItem(value: 'settings', child: Text(AppStrings.settings)),
+          const PopupMenuItem(value: 'export', child: Text(AppStrings.exportLogs)),
           const PopupMenuItem(
             value: 'clear',
-            child: Text('Clear all', style: TextStyle(color: Colors.red)),
+            child: Text(AppStrings.clearAll, style: TextStyle(color: Colors.red)),
           ),
         ],
         onSelected: (v) async {
@@ -300,7 +299,7 @@ class _NetworkInspectorPageState extends State<NetworkInspectorPage> {
     actions: [
       IconButton(
         icon: const Icon(Icons.delete_outline),
-        tooltip: 'Delete selected',
+        tooltip: AppStrings.deleteSelected,
         onPressed: () async {
           // TODO: implement batch delete when repo supports per-item delete
           setState(() {
@@ -463,9 +462,9 @@ class _SortChip extends StatelessWidget {
   final ValueChanged<_SortMode> onChanged;
 
   String get _label => switch (current) {
-    _SortMode.newest => 'Newest',
-    _SortMode.slowest => 'Slowest',
-    _SortMode.largest => 'Largest',
+    _SortMode.newest => AppStrings.sortNewest,
+    _SortMode.slowest => AppStrings.sortSlowest,
+    _SortMode.largest => AppStrings.sortLargest,
   };
 
   @override
@@ -477,19 +476,22 @@ class _SortChip extends StatelessWidget {
       itemBuilder: (_) => [
         const PopupMenuItem(
           value: _SortMode.newest,
-          child: Text('Newest first'),
+          child: Text(AppStrings.newestFirst),
         ),
         const PopupMenuItem(
           value: _SortMode.slowest,
-          child: Text('Slowest first'),
+          child: Text(AppStrings.slowestFirst),
         ),
         const PopupMenuItem(
           value: _SortMode.largest,
-          child: Text('Largest first'),
+          child: Text(AppStrings.largestFirst),
         ),
       ],
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSizes.paddingMd - 2,
+          vertical: 5,
+        ),
         decoration: BoxDecoration(
           color: theme.colorScheme.surfaceContainerLow,
           borderRadius: BorderRadius.circular(20),
@@ -498,14 +500,17 @@ class _SortChip extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.sort, size: 13),
-            const SizedBox(width: 4),
+            const Icon(Icons.sort, size: AppSizes.iconXs + 3),
+            const SizedBox(width: AppSizes.gap4),
             Text(
               _label,
-              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+              style: const TextStyle(
+                fontSize: AppSizes.textMd,
+                fontWeight: FontWeight.w500,
+              ),
             ),
-            const SizedBox(width: 2),
-            const Icon(Icons.arrow_drop_down, size: 16),
+            const SizedBox(width: AppSizes.gap2),
+            const Icon(Icons.arrow_drop_down, size: AppSizes.iconMd),
           ],
         ),
       ),

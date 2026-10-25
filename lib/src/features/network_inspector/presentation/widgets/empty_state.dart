@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/core.dart';
+
 /// Friendly empty state shown when no requests have been captured.
 class EmptyState extends StatefulWidget {
   const EmptyState({super.key, this.filtered = false});
@@ -44,13 +46,13 @@ class _EmptyStateState extends State<EmptyState>
         child: SlideTransition(
           position: _slide,
           child: Padding(
-            padding: const EdgeInsets.all(40),
+            padding: const EdgeInsets.all(AppSizes.paddingAll40),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Container(
-                  width: 80,
-                  height: 80,
+                  width: AppSizes.emptyStateIconBox,
+                  height: AppSizes.emptyStateIconBox,
                   decoration: BoxDecoration(
                     color: theme.colorScheme.surfaceContainerHighest,
                     shape: BoxShape.circle,
@@ -59,27 +61,23 @@ class _EmptyStateState extends State<EmptyState>
                     widget.filtered
                         ? Icons.search_off_rounded
                         : Icons.network_check_rounded,
-                    size: 40,
+                    size: AppSizes.emptyStateIcon,
                     color: theme.colorScheme.onSurfaceVariant,
                   ),
                 ),
-                const SizedBox(height: 24),
-                Text(
+                const SizedBox(height: AppSizes.gap24),
+                AppText.title(
                   widget.filtered
-                      ? 'No matching requests'
-                      : 'No requests yet',
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: theme.colorScheme.onSurface,
-                  ),
+                      ? AppStrings.emptyNoMatches
+                      : AppStrings.emptyNoRequests,
                 ),
-                const SizedBox(height: 8),
-                Text(
+                const SizedBox(height: AppSizes.gap8),
+                AppText.body(
                   widget.filtered
-                      ? 'Try adjusting your search or filters.'
-                      : 'Make an HTTP request through a\nconfigured Dio or http client to\nsee it appear here.',
+                      ? AppStrings.emptyNoMatchesSubtitle
+                      : AppStrings.emptyNoRequestsSubtitle,
                   textAlign: TextAlign.center,
-                  style: theme.textTheme.bodyMedium?.copyWith(
+                  style: TextStyle(
                     color: theme.colorScheme.onSurfaceVariant,
                     height: 1.5,
                   ),

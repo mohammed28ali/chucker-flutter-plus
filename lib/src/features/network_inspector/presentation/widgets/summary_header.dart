@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 
+import '../../../../config/theme/inspector_colors.dart';
+import '../../../../core/core.dart';
 import '../../domain/entities/network_transaction.dart';
 import 'method_chip.dart';
 import 'status_badge.dart';
-import '../../../../config/theme/inspector_colors.dart';
 
 /// Summary header showing aggregate stats about all captured requests.
 class SummaryHeader extends StatelessWidget {
@@ -29,22 +30,30 @@ class SummaryHeader extends StatelessWidget {
         .fold<int>(0, (a, b) => a + b);
 
     return Container(
-      margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      margin: const EdgeInsets.fromLTRB(
+        AppSizes.paddingLg,
+        AppSizes.paddingMd,
+        AppSizes.paddingLg,
+        0,
+      ),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSizes.paddingLg,
+        vertical: AppSizes.paddingMd,
+      ),
       decoration: BoxDecoration(
         color: theme.colorScheme.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppSizes.radiusMd),
         border: Border.all(color: theme.colorScheme.outlineVariant, width: 1),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          _stat(context, '$total', 'Total', Icons.list_alt_outlined),
+          _stat(context, '$total', AppStrings.statTotal, Icons.list_alt_outlined),
           _divider(context),
           _stat(
             context,
             '$successes',
-            'Success',
+            AppStrings.statSuccess,
             Icons.check_circle_outline,
             color: InspectorColors.status2xx,
           ),
@@ -52,14 +61,14 @@ class SummaryHeader extends StatelessWidget {
           _stat(
             context,
             '$errors',
-            'Errors',
+            AppStrings.statErrors,
             Icons.error_outline,
             color: InspectorColors.status5xx,
           ),
           _divider(context),
-          _stat(context, '${avgMs}ms', 'Avg', Icons.timer_outlined),
+          _stat(context, '${avgMs}ms', AppStrings.statAvg, Icons.timer_outlined),
           _divider(context),
-          _stat(context, _size(totalBytes), 'Data', Icons.data_usage_outlined),
+          _stat(context, _size(totalBytes), AppStrings.statData, Icons.data_usage_outlined),
         ],
       ),
     );
@@ -77,18 +86,12 @@ class SummaryHeader extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, size: 16, color: c.withOpacity(0.7)),
-        const SizedBox(height: 4),
-        Text(
-          value,
-          style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: c),
-        ),
-        Text(
+        Icon(icon, size: AppSizes.iconMd, color: c.withOpacity(0.7)),
+        const SizedBox(height: AppSizes.gap4),
+        AppText.stat(value, style: TextStyle(color: c)),
+        AppText.caption(
           label,
-          style: TextStyle(
-            fontSize: 10,
-            color: theme.colorScheme.onSurfaceVariant,
-          ),
+          style: TextStyle(color: theme.colorScheme.onSurfaceVariant),
         ),
       ],
     );
@@ -120,21 +123,25 @@ class MethodBreakdownRow extends StatelessWidget {
     }
     if (methods.isEmpty) return const SizedBox.shrink();
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+      padding: const EdgeInsets.fromLTRB(
+        AppSizes.paddingLg,
+        AppSizes.gap8,
+        AppSizes.paddingLg,
+        0,
+      ),
       child: Wrap(
-        spacing: 6,
-        runSpacing: 4,
+        spacing: AppSizes.gap6,
+        runSpacing: AppSizes.gap4,
         children: methods.entries
             .map(
               (e) => Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   MethodChip(e.key, small: true),
-                  const SizedBox(width: 4),
-                  Text(
+                  const SizedBox(width: AppSizes.gap4),
+                  AppText.caption(
                     '${e.value}',
                     style: TextStyle(
-                      fontSize: 11,
                       color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
                   ),

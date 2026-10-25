@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../config/theme/inspector_colors.dart';
+import '../../../../core/core.dart';
 
 /// Color-coded chip showing the HTTP method.
 class MethodChip extends StatelessWidget {
@@ -13,19 +14,19 @@ class MethodChip extends StatelessWidget {
     final color = InspectorColors.methodColor(method);
     return Container(
       padding: EdgeInsets.symmetric(
-        horizontal: small ? 6 : 8,
-        vertical: small ? 2 : 3,
+        horizontal: small ? AppSizes.gap6 : AppSizes.gap8,
+        vertical: small ? AppSizes.gap2 : 3,
       ),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.12),
-        borderRadius: BorderRadius.circular(6),
-        border: Border.all(color: color.withOpacity(0.4), width: 1),
+        color: color.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(AppSizes.radiusSm),
+        border: Border.all(color: color.withValues(alpha: 0.4), width: 1),
       ),
       child: Text(
         method.toUpperCase(),
         style: TextStyle(
           color: color,
-          fontSize: small ? 10 : 11,
+          fontSize: small ? AppSizes.textXs : AppSizes.textSm,
           fontWeight: FontWeight.w700,
           letterSpacing: 0.5,
           fontFamily: 'monospace',

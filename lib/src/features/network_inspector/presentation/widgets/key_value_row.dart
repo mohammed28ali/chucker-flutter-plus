@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../../../core/core.dart';
+
 /// A single key-value info row used in Overview tab and header lists.
 class KeyValueRow extends StatelessWidget {
   const KeyValueRow({
@@ -32,36 +34,41 @@ class KeyValueRow extends StatelessWidget {
     );
     final valueStyle = theme.textTheme.bodyMedium?.copyWith(
       fontFamily: monospace ? 'monospace' : null,
-      color: muted ? theme.colorScheme.onSurfaceVariant : theme.colorScheme.onSurface,
+      color: muted
+          ? theme.colorScheme.onSurfaceVariant
+          : theme.colorScheme.onSurface,
     );
 
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 16),
+      padding: const EdgeInsets.symmetric(
+        vertical: AppSizes.gap6,
+        horizontal: AppSizes.paddingLg,
+      ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(
-            width: 120,
+            width: AppSizes.labelColumnWidth,
             child: Text(label.toUpperCase(), style: labelStyle),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: AppSizes.gap8),
           Expanded(
             child: redacted
                 ? Row(
                     children: [
                       const Text(
-                        '••••••••••••',
+                        AppStrings.redactedMask,
                         style: TextStyle(letterSpacing: 2),
                       ),
                       if (onReveal != null) ...[
-                        const SizedBox(width: 8),
+                        const SizedBox(width: AppSizes.gap8),
                         GestureDetector(
                           onTap: onReveal,
                           child: Text(
-                            'reveal',
+                            AppStrings.reveal,
                             style: TextStyle(
                               color: theme.colorScheme.primary,
-                              fontSize: 12,
+                              fontSize: AppSizes.textMd,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
@@ -87,7 +94,7 @@ class KeyValueRow extends StatelessWidget {
   void _showCopied(BuildContext context) {
     ScaffoldMessenger.maybeOf(context)?.showSnackBar(
       const SnackBar(
-        content: Text('Copied to clipboard'),
+        content: Text(AppStrings.copiedToClipboard),
         duration: Duration(milliseconds: 1500),
       ),
     );
@@ -100,7 +107,7 @@ class KeyValueDivider extends StatelessWidget {
   @override
   Widget build(BuildContext context) => const Divider(
     height: 1,
-    indent: 16,
-    endIndent: 16,
+    indent: AppSizes.paddingLg,
+    endIndent: AppSizes.paddingLg,
   );
 }
