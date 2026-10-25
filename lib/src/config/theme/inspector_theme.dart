@@ -3,6 +3,10 @@ import 'package:flutter/material.dart';
 import 'inspector_colors.dart';
 
 abstract final class InspectorTheme {
+  static const String package = 'chucker_flutter_plus';
+  static const String fontRoboto = 'packages/$package/Roboto';
+  static const String fontMonospace = 'packages/$package/monospace';
+
   static ThemeData light() => _build(Brightness.light);
   static ThemeData dark() => _build(Brightness.dark);
 
@@ -17,7 +21,7 @@ abstract final class InspectorTheme {
     return ThemeData(
       useMaterial3: true,
       colorScheme: scheme,
-      fontFamily: 'Roboto',
+      fontFamily: fontRoboto,
       scaffoldBackgroundColor: isDark
           ? InspectorColors.surfaceDark
           : InspectorColors.surface,
