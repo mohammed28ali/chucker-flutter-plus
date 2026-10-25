@@ -14,8 +14,9 @@ class BodyCapture {
   }
 
   static int size(Object? value, String? rawValue) {
-    if (value is Uint8List || value is List<int>)
+    if (value is Uint8List || value is List<int>) {
       return (value as List<int>).length;
+    }
     return rawValue == null ? 0 : utf8.encode(rawValue).length;
   }
 

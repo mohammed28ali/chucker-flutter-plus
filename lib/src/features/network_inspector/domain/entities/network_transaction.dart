@@ -1,9 +1,5 @@
 import 'dart:convert';
 
-/// An immutable, persistable record of a completed HTTP transaction.
-///
-/// Raw bodies deliberately retain their original string/byte representation;
-/// presentation may choose to format them but must not overwrite them.
 class NetworkTransaction {
   NetworkTransaction({
     required this.id,

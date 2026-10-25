@@ -4,6 +4,8 @@ import 'package:flutter/services.dart';
 import 'package:share_plus/share_plus.dart';
 import '../../../../config/dependency_injection/chucker_dependencies.dart';
 import '../../domain/entities/network_transaction.dart';
+import '../chucker_flutter.dart';
+import '../inspector_settings.dart';
 
 class NetworkInspectorPage extends StatefulWidget {
   const NetworkInspectorPage({
@@ -24,6 +26,7 @@ class _NetworkInspectorPageState extends State<NetworkInspectorPage> {
   String _query = '';
   String _method = 'All';
   String _status = 'All';
+  bool _openedInitial = false;
   @override
   void initState() {
     super.initState();
@@ -41,6 +44,12 @@ class _NetworkInspectorPageState extends State<NetworkInspectorPage> {
         onPressed: widget.onClose,
       ),
       actions: [
+        IconButton(
+          icon: const Icon(Icons.settings),
+          onPressed: () => Navigator.of(
+            context,
+          ).push(MaterialPageRoute(builder: (_) => const _SettingsPage())),
+        ),
         IconButton(onPressed: _reload, icon: const Icon(Icons.refresh)),
         IconButton(
           icon: const Icon(Icons.delete_outline),
@@ -55,6 +64,23 @@ class _NetworkInspectorPageState extends State<NetworkInspectorPage> {
       future: _future,
       builder: (context, snapshot) {
         final all = snapshot.data ?? const <NetworkTransaction>[];
+        final initial = widget.initiallySelectedId == null
+            ? null
+            : all
+                  .where((t) => t.id == widget.initiallySelectedId)
+                  .cast<NetworkTransaction?>()
+                  .firstOrNull;
+        if (!_openedInitial && initial != null) {
+          _openedInitial = true;
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted)
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => _Details(transaction: initial),
+                ),
+              );
+          });
+        }
         final values = all
             .where(
               (t) =>
@@ -289,3 +315,93 @@ String _size(int bytes) => bytes < 1024
     : bytes < 1024 * 1024
     ? '${(bytes / 1024).toStringAsFixed(1)} KB'
     : '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
+
+class _SettingsPage extends StatelessWidget {
+  const _SettingsPage();
+  @override
+  Widget build(BuildContext context) => Scaffold(
+    appBar: AppBar(title: const Text('Inspector settings')),
+    body: ValueListenableBuilder<InspectorSettings>(
+      valueListenable: ChuckerFlutterPlus.settings,
+      builder: (context, value, _) => ListView(
+        children: [
+          SwitchListTile(
+            title: const Text('In-app banner'),
+            value: value.inAppBanner,
+            onChanged: (v) => ChuckerFlutterPlus.settings.save(
+              value.copyWith(inAppBanner: v),
+            ),
+          ),
+          SwitchListTile(
+            title: const Text('System notifications'),
+            value: value.systemNotifications,
+            onChanged: (v) => ChuckerFlutterPlus.settings.save(
+              value.copyWith(systemNotifications: v),
+            ),
+          ),
+          SwitchListTile(
+            title: const Text('Status bar while foreground'),
+            value: value.statusBarWhileForeground,
+            onChanged: (v) => ChuckerFlutterPlus.settings.save(
+              value.copyWith(statusBarWhileForeground: v),
+            ),
+          ),
+          SwitchListTile(
+            title: const Text('Show only errors'),
+            value: value.onlyErrors,
+            onChanged: (v) =>
+                ChuckerFlutterPlus.settings.save(value.copyWith(onlyErrors: v)),
+          ),
+          ListTile(
+            title: const Text('Banner duration'),
+            subtitle: Text('${value.bannerDuration.inSeconds} seconds'),
+            trailing: DropdownButton<int>(
+              value: value.bannerDuration.inSeconds,
+              items: const [1, 3, 5, 10]
+                  .map((s) => DropdownMenuItem(value: s, child: Text('$s s')))
+                  .toList(),
+              onChanged: (s) {
+                if (s != null)
+                  ChuckerFlutterPlus.settings.save(
+                    value.copyWith(bannerDuration: Duration(seconds: s)),
+                  );
+              },
+            ),
+          ),
+          ListTile(
+            title: const Text('Banner position'),
+            trailing: DropdownButton<BannerPosition>(
+              value: value.bannerPosition,
+              items: BannerPosition.values
+                  .map((p) => DropdownMenuItem(value: p, child: Text(p.name)))
+                  .toList(),
+              onChanged: (p) {
+                if (p != null)
+                  ChuckerFlutterPlus.settings.save(
+                    value.copyWith(bannerPosition: p),
+                  );
+              },
+            ),
+          ),
+          ListTile(
+            title: const Text('Max log entries'),
+            trailing: DropdownButton<int>(
+              value: value.maximumEntries,
+              items: const [50, 100, 200, 500]
+                  .map((n) => DropdownMenuItem(value: n, child: Text('$n')))
+                  .toList(),
+              onChanged: (n) async {
+                if (n != null) {
+                  await ChuckerFlutterPlus.settings.save(
+                    value.copyWith(maximumEntries: n),
+                  );
+                  ChuckerFlutterPlus.configure(maximumEntries: n);
+                }
+              },
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+}

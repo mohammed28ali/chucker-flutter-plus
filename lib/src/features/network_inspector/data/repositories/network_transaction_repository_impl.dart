@@ -3,7 +3,6 @@ import '../../domain/repositories/network_transaction_repository.dart';
 import '../datasources/local/network_transaction_local_data_source.dart';
 import '../models/network_transaction_model.dart';
 
-/// Local-persistence implementation of [NetworkTransactionRepository].
 class NetworkTransactionRepositoryImpl implements NetworkTransactionRepository {
   NetworkTransactionRepositoryImpl(
     this._localDataSource, {

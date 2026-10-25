@@ -4,7 +4,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../models/network_transaction_model.dart';
 
-/// Stores inspector records in the host application's local preferences.
 class NetworkTransactionLocalDataSource {
   static const _storageKey = 'chucker_flutter_plus.transactions.v1';
 

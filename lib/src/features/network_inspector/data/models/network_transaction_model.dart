@@ -1,6 +1,5 @@
 import '../../domain/entities/network_transaction.dart';
 
-/// JSON-safe representation used by the local data source.
 class NetworkTransactionModel extends NetworkTransaction {
   NetworkTransactionModel({
     required super.id,

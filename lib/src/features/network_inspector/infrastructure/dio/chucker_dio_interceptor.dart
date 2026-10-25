@@ -4,7 +4,6 @@ import '../../domain/entities/network_transaction.dart';
 import '../body_capture.dart';
 import '../../presentation/chucker_flutter.dart';
 
-/// A Dio interceptor that records responses and failures for inspection.
 class ChuckerDioInterceptor extends Interceptor {
   static const _startedAtKey = 'chucker_flutter_plus.started_at';
 
@@ -89,7 +88,6 @@ class ChuckerDioInterceptor extends Interceptor {
   }
 
   void _record(NetworkTransaction transaction) {
-    // Dio's interceptor API is synchronous; persistence must not delay a call.
     ChuckerFlutterPlus.record(transaction).ignore();
   }
 

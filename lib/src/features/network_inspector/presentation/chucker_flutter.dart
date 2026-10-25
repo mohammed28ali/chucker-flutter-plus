@@ -6,8 +6,10 @@ import '../domain/entities/network_transaction.dart';
 import '../infrastructure/body_capture.dart';
 import '../infrastructure/notifications/chucker_notification_service.dart';
 import 'pages/network_inspector_page.dart';
+import 'inspector_settings.dart';
+import 'inspector_config.dart';
+import 'request_banner.dart';
 
-/// Configuration and host-safe presentation entry point for the inspector.
 class ChuckerFlutterPlus {
   ChuckerFlutterPlus._();
   static bool showOnRelease = false;
@@ -21,10 +23,24 @@ class ChuckerFlutterPlus {
   static ChuckerDependencies _dependencies = ChuckerDependencies.create();
   static OverlayEntry? _entry;
   static ChuckerNotificationService? _notifications;
+  static final settings = InspectorSettingsStore();
+  static final _banner = RequestBannerController();
   static bool get isEnabled => kDebugMode || showOnRelease;
 
-  /// [navigatorKey] is only consulted to locate the host overlay. It is never
-  /// registered with, or used to navigate, the host app.
+  static NotificationDelivery notificationDelivery({
+    required bool isForeground,
+    required InspectorSettings settings,
+  }) {
+    if (isForeground && settings.inAppBanner) return NotificationDelivery.inApp;
+    if (settings.systemNotifications &&
+        (!isForeground ||
+            !settings.inAppBanner ||
+            settings.statusBarWhileForeground)) {
+      return NotificationDelivery.statusBar;
+    }
+    return NotificationDelivery.none;
+  }
+
   static Future<void> initialize({
     int maximumEntries = 100,
     Duration? retention,
@@ -42,6 +58,14 @@ class ChuckerFlutterPlus {
       enableOnRelease: enableOnRelease,
       redactHeaders: redactHeaders,
     );
+    await settings.load();
+    configure(
+      maximumEntries: settings.value.maximumEntries,
+      retention: retention,
+      enableOnRelease: enableOnRelease,
+      redactHeaders: redactHeaders,
+    );
+    if (navigatorKey?.currentContext case final context?) _banner.bind(context);
     showNotification = enableNotifications;
     ChuckerFlutterPlus.notificationChannelName = notificationChannelName;
     if (enableNotifications) {
@@ -65,12 +89,13 @@ class ChuckerFlutterPlus {
     bool? enableOnRelease,
     Set<String>? redactHeaders,
   }) {
-    if (maximumEntries < 0)
+    if (maximumEntries < 0) {
       throw ArgumentError.value(
         maximumEntries,
         'maximumEntries',
         'Must not be negative.',
       );
+    }
     showOnRelease = enableOnRelease ?? showOnRelease;
     sensitiveHeaders = (redactHeaders ?? sensitiveHeaders)
         .map((e) => e.toLowerCase())
@@ -84,12 +109,13 @@ class ChuckerFlutterPlus {
   static Map<String, String> redactHeaders(Map<String, String> headers) =>
       BodyCapture.redact(headers, sensitiveHeaders);
 
-  /// Opens an isolated Navigator in an OverlayEntry and leaves host routes alone.
   static void showInspector(BuildContext context, {String? requestId}) {
     if (!isEnabled || _entry != null) return;
     final overlay = Overlay.maybeOf(context, rootOverlay: true);
-    if (overlay == null)
+    if (overlay == null) {
       throw StateError('showInspector requires a context below an Overlay.');
+    }
+    _banner.bind(context);
     _entry = OverlayEntry(
       builder: (_) => Material(
         color: Theme.of(context).colorScheme.surface,
@@ -126,10 +152,70 @@ class ChuckerFlutterPlus {
   static Future<void> record(NetworkTransaction transaction) async {
     if (!isEnabled) return;
     await _dependencies.recordTransaction(transaction);
-    if (showNotification)
+    final foreground =
+        WidgetsBinding.instance.lifecycleState == AppLifecycleState.resumed;
+    final canShow = !settings.value.onlyErrors || !transaction.succeeded;
+    final delivery = notificationDelivery(
+      isForeground: foreground,
+      settings: settings.value,
+    );
+    if (delivery == NotificationDelivery.inApp && canShow) {
+      _banner.show(transaction, settings.value, () {
+        _banner.dismiss();
+        final context = _banner.context;
+        if (context != null) showInspector(context, requestId: transaction.id);
+      });
+    }
+    if (delivery == NotificationDelivery.statusBar &&
+        showNotification &&
+        canShow) {
       await _notifications?.show(
         transaction,
         channelName: notificationChannelName,
       );
+    }
+  }
+}
+
+/// Concise public facade for configuration-object based setup.
+class Inspector {
+  Inspector._();
+  static Future<void> init({
+    required InspectorConfig config,
+    GlobalKey<NavigatorState>? navigatorKey,
+    void Function(String? payload)? onUnrecognizedNotificationPayload,
+  }) async {
+    await ChuckerFlutterPlus.initialize(
+      maximumEntries: config.maximumEntries,
+      enableNotifications: config.showStatusBarNotification,
+      notificationIcon: config.statusBarIcon,
+      navigatorKey: navigatorKey,
+      onUnrecognizedNotificationPayload: onUnrecognizedNotificationPayload,
+    );
+    await updateConfig(config);
+  }
+
+  static Future<void> updateConfig(InspectorConfig config) async {
+    if (config.showStatusBarNotification &&
+        ChuckerFlutterPlus._notifications == null) {
+      await ChuckerFlutterPlus.initialize(
+        maximumEntries: config.maximumEntries,
+        enableNotifications: true,
+        notificationIcon: config.statusBarIcon,
+      );
+    }
+    await ChuckerFlutterPlus.settings.save(
+      InspectorSettings(
+        inAppBanner: config.showInAppNotification,
+        systemNotifications: config.showStatusBarNotification,
+        statusBarWhileForeground: config.statusBarWhileForeground,
+        bannerDuration: config.inAppNotificationDuration,
+        bannerPosition: config.inAppNotificationPosition,
+        onlyErrors: config.notifyOnlyOnError,
+        maximumEntries: config.maximumEntries,
+      ),
+    );
+    ChuckerFlutterPlus.showNotification = config.showStatusBarNotification;
+    ChuckerFlutterPlus.configure(maximumEntries: config.maximumEntries);
   }
 }

@@ -4,7 +4,6 @@ import '../../domain/entities/network_transaction.dart';
 import '../body_capture.dart';
 import '../../presentation/chucker_flutter.dart';
 
-/// An [http.BaseClient] wrapper that records each completed request.
 class ChuckerHttpClient extends http.BaseClient {
   ChuckerHttpClient(this._client);
 
@@ -71,8 +70,9 @@ class ChuckerHttpClient extends http.BaseClient {
     if (request case http.Request(:final body)) {
       return body;
     }
-    if (request case http.MultipartRequest(:final fields))
+    if (request case http.MultipartRequest(:final fields)) {
       return fields.toString();
+    }
     return null;
   }
 
