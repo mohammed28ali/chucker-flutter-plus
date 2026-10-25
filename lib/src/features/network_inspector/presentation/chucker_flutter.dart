@@ -1,5 +1,7 @@
+import 'package:chucker_flutter_plus/src/config/theme/inspector_theme.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+
 import 'dart:convert';
 
 import '../../../config/dependency_injection/chucker_dependencies.dart';
@@ -117,20 +119,14 @@ class ChuckerFlutterPlus {
       throw StateError('showInspector requires a context below an Overlay.');
     }
     _banner.bind(context);
+    // Capture system brightness at show-time; the inspector has its own theme.
+    final brightness =
+        MediaQuery.maybePlatformBrightnessOf(context) ?? Brightness.light;
     _entry = OverlayEntry(
-      builder: (_) => Material(
-        color: Theme.of(context).colorScheme.surface,
-        child: SafeArea(
-          child: Navigator(
-            onGenerateRoute: (_) => MaterialPageRoute<void>(
-              builder: (_) => NetworkInspectorPage(
-                dependencies: _dependencies,
-                initiallySelectedId: requestId,
-                onClose: hideInspector,
-              ),
-            ),
-          ),
-        ),
+      builder: (_) => _IsolatedInspector(
+        brightness: brightness,
+        dependencies: _dependencies,
+        requestId: requestId,
       ),
     );
     overlay.insert(_entry!);
@@ -248,4 +244,58 @@ class Inspector {
   static Future<void> clearLogs() => ChuckerFlutterPlus.clearLogs();
   static Future<String> exportLogs() => ChuckerFlutterPlus.exportLogs();
   static Future<void> dispose() => ChuckerFlutterPlus.dispose();
+}
+
+/// A self-contained overlay widget that provides an isolated Material 3 theme
+/// so the inspector never inherits or modifies the host app's theme.
+class _IsolatedInspector extends StatefulWidget {
+  const _IsolatedInspector({
+    required this.brightness,
+    required this.dependencies,
+    this.requestId,
+  });
+  final Brightness brightness;
+  final ChuckerDependencies dependencies;
+  final String? requestId;
+
+  @override
+  State<_IsolatedInspector> createState() => _IsolatedInspectorState();
+}
+
+class _IsolatedInspectorState extends State<_IsolatedInspector> {
+  late Brightness _brightness;
+
+  @override
+  void initState() {
+    super.initState();
+    _brightness = widget.brightness;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // Re-read system brightness so a toggle in Settings works immediately
+    final theme = _brightness == Brightness.dark
+        ? InspectorTheme.dark()
+        : InspectorTheme.light();
+    return Theme(
+      data: theme,
+      child: Material(
+        color: theme.scaffoldBackgroundColor,
+        child: SafeArea(
+          child: Navigator(
+            onGenerateRoute: (_) => MaterialPageRoute<void>(
+              builder: (_) => Theme(
+                data: theme,
+                child: NetworkInspectorPage(
+                  dependencies: widget.dependencies,
+                  initiallySelectedId: widget.requestId,
+                  onClose: ChuckerFlutterPlus.hideInspector,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }

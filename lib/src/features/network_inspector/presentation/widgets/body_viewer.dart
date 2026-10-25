@@ -1,7 +1,8 @@
 import 'dart:convert';
+
+import 'package:chucker_flutter_plus/src/config/theme/inspector_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../theme/inspector_colors.dart';
 
 enum _ViewMode { tree, pretty, raw }
 
@@ -138,7 +139,9 @@ class _BodyViewerState extends State<BodyViewer> {
           _FormDataTable(body: body)
         else
           _TextBody(
-            body: _isJson && _mode == _ViewMode.pretty ? _prettyJson(body) : body,
+            body: _isJson && _mode == _ViewMode.pretty
+                ? _prettyJson(body)
+                : body,
             wordWrap: _wordWrap,
             showLineNumbers: _showLineNumbers,
             search: _search,
@@ -245,7 +248,9 @@ class _ModeButton extends StatelessWidget {
         duration: const Duration(milliseconds: 150),
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
         decoration: BoxDecoration(
-          color: selected ? theme.colorScheme.primaryContainer : Colors.transparent,
+          color: selected
+              ? theme.colorScheme.primaryContainer
+              : Colors.transparent,
           borderRadius: BorderRadius.circular(6),
           border: Border.all(
             color: selected
@@ -315,9 +320,7 @@ class _TextBody extends StatelessWidget {
                 const SizedBox(width: 12),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    for (final l in lines) Text(l, style: textStyle),
-                  ],
+                  children: [for (final l in lines) Text(l, style: textStyle)],
                 ),
               ],
             )
@@ -343,6 +346,7 @@ class _JsonTree extends StatelessWidget {
 
 class _JsonNode extends StatefulWidget {
   const _JsonNode({
+    super.key,
     required this.value,
     required this.depth,
     this.keyName,
@@ -384,9 +388,7 @@ class _JsonNodeState extends State<_JsonNode> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Icon(
-                  _expanded
-                      ? Icons.arrow_drop_down
-                      : Icons.arrow_right,
+                  _expanded ? Icons.arrow_drop_down : Icons.arrow_right,
                   size: 18,
                   color: isDark
                       ? InspectorColors.jsonKeyDark
@@ -411,9 +413,7 @@ class _JsonNodeState extends State<_JsonNode> {
                   style: TextStyle(
                     fontFamily: 'monospace',
                     fontSize: 12,
-                    color: isDark
-                        ? Colors.white70
-                        : Colors.black87,
+                    color: isDark ? Colors.white70 : Colors.black87,
                   ),
                 ),
               ],
@@ -425,8 +425,7 @@ class _JsonNodeState extends State<_JsonNode> {
               child: isMap
                   ? Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: (v as Map<String, dynamic>)
-                          .entries
+                      children: (v as Map<String, dynamic>).entries
                           .map(
                             (e) => _JsonNode(
                               key: ValueKey(e.key),
@@ -453,7 +452,11 @@ class _JsonNodeState extends State<_JsonNode> {
                           .toList(),
                     ),
             ),
-          if (_expanded) Text(bracket.$2, style: const TextStyle(fontFamily: 'monospace', fontSize: 12)),
+          if (_expanded)
+            Text(
+              bracket.$2,
+              style: const TextStyle(fontFamily: 'monospace', fontSize: 12),
+            ),
         ],
       );
     }
@@ -497,10 +500,14 @@ class _JsonNodeState extends State<_JsonNode> {
   }
 
   Color _color(Object? v, bool dark) {
-    if (v == null) return dark ? InspectorColors.jsonNullDark : InspectorColors.jsonNull;
-    if (v is String) return dark ? InspectorColors.jsonStringDark : InspectorColors.jsonString;
-    if (v is num) return dark ? InspectorColors.jsonNumberDark : InspectorColors.jsonNumber;
-    if (v is bool) return dark ? InspectorColors.jsonBoolDark : InspectorColors.jsonBool;
+    if (v == null)
+      return dark ? InspectorColors.jsonNullDark : InspectorColors.jsonNull;
+    if (v is String)
+      return dark ? InspectorColors.jsonStringDark : InspectorColors.jsonString;
+    if (v is num)
+      return dark ? InspectorColors.jsonNumberDark : InspectorColors.jsonNumber;
+    if (v is bool)
+      return dark ? InspectorColors.jsonBoolDark : InspectorColors.jsonBool;
     return dark ? Colors.white70 : Colors.black87;
   }
 }
@@ -524,10 +531,7 @@ class _FormDataTable extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
       child: Table(
-        columnWidths: const {
-          0: IntrinsicColumnWidth(),
-          1: FlexColumnWidth(),
-        },
+        columnWidths: const {0: IntrinsicColumnWidth(), 1: FlexColumnWidth()},
         border: TableBorder.all(
           color: theme.colorScheme.outlineVariant,
           borderRadius: BorderRadius.circular(8),
@@ -543,10 +547,12 @@ class _FormDataTable extends StatelessWidget {
             ],
           ),
           ...pairs.map(
-            (e) => TableRow(children: [
-              _cell(e.key, theme: theme),
-              _cell(e.value, theme: theme),
-            ]),
+            (e) => TableRow(
+              children: [
+                _cell(e.key, theme: theme),
+                _cell(e.value, theme: theme),
+              ],
+            ),
           ),
         ],
       ),
