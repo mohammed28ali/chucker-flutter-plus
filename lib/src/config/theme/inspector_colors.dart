@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-/// All color tokens used by the Chucker inspector.
-/// These are intentionally NOT derived from the host app's theme.
 abstract final class InspectorColors {
   // ── Brand seed ──────────────────────────────────────────────────
   static const Color seed = Color(0xFF4F6AF5);
@@ -73,10 +71,18 @@ abstract final class InspectorColors {
   };
 
   static (Color fg, Color bg) statusColors(int? code, {required bool dark}) {
-    if (code == null) return dark ? (statusError, statusErrorBg) : (statusError, statusErrorBg);
-    if (code < 300) return dark ? (status2xxDark, status2xxBgDark) : (status2xx, status2xxBg);
-    if (code < 400) return dark ? (status3xxDark, status3xxBgDark) : (status3xx, status3xxBg);
-    if (code < 500) return dark ? (status4xxDark, status4xxBgDark) : (status4xx, status4xxBg);
+    if (code == null) {
+      return dark ? (statusError, statusErrorBg) : (statusError, statusErrorBg);
+    }
+    if (code < 300) {
+      return dark ? (status2xxDark, status2xxBgDark) : (status2xx, status2xxBg);
+    }
+    if (code < 400) {
+      return dark ? (status3xxDark, status3xxBgDark) : (status3xx, status3xxBg);
+    }
+    if (code < 500) {
+      return dark ? (status4xxDark, status4xxBgDark) : (status4xx, status4xxBg);
+    }
     return dark ? (status5xxDark, status5xxBgDark) : (status5xx, status5xxBg);
   }
 }

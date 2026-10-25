@@ -1,8 +1,7 @@
 import 'dart:convert';
 
 import 'package:chucker_flutter_plus/src/config/theme/inspector_colors.dart';
-import 'package:chucker_flutter_plus/src/core/utils/app_sizes.dart';
-import 'package:chucker_flutter_plus/src/core/utils/app_strings.dart';
+import 'package:chucker_flutter_plus/src/core/core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -90,12 +89,7 @@ class _BodyViewerState extends State<BodyViewer> {
           onLineNumbersChange: (v) => setState(() => _showLineNumbers = v),
           onCopy: () {
             Clipboard.setData(ClipboardData(text: body));
-            ScaffoldMessenger.maybeOf(context)?.showSnackBar(
-              const SnackBar(
-                content: Text(AppStrings.bodyCopied),
-                duration: Duration(milliseconds: 1500),
-              ),
-            );
+            context.successSnackBar(AppStrings.bodyCopied);
           },
           body: body,
         ),

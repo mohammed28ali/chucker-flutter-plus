@@ -69,7 +69,7 @@ class _RequestDetailPageState extends State<RequestDetailPage>
             snap: false,
             leading: IconButton(
               icon: const Icon(Icons.arrow_back),
-              onPressed: () => Navigator.of(context).pop(),
+              onPressed: () => context.pop(),
             ),
             actions: [
               IconButton(
@@ -163,22 +163,12 @@ class _RequestDetailPageState extends State<RequestDetailPage>
       case 'copy_curl':
         await Clipboard.setData(ClipboardData(text: _buildCurl(t)));
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text(AppStrings.curlCopied),
-              duration: Duration(milliseconds: 1500),
-            ),
-          );
+          context.successSnackBar(AppStrings.curlCopied);
         }
       case 'copy_url':
         await Clipboard.setData(ClipboardData(text: t.uri.toString()));
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text(AppStrings.urlCopied),
-              duration: Duration(milliseconds: 1500),
-            ),
-          );
+          context.successSnackBar(AppStrings.urlCopied);
         }
       case 'share_json':
         final json = jsonEncode({
@@ -262,12 +252,7 @@ class _HeaderState extends State<_Header> {
           onTap: () => setState(() => _urlExpanded = !_urlExpanded),
           onLongPress: () {
             Clipboard.setData(ClipboardData(text: t.uri.toString()));
-            ScaffoldMessenger.maybeOf(context)?.showSnackBar(
-              const SnackBar(
-                content: Text(AppStrings.urlCopied),
-                duration: Duration(milliseconds: 1200),
-              ),
-            );
+            context.successSnackBar(AppStrings.urlCopied);
           },
           child: AnimatedCrossFade(
             firstChild: Text(
@@ -774,19 +759,9 @@ class _MediaTab extends StatelessWidget {
   }
 
   void _showFullImage(BuildContext context, List<int> bytes) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => Scaffold(
-          backgroundColor: Colors.black,
-          appBar: AppBar(
-            backgroundColor: Colors.black,
-            iconTheme: const IconThemeData(color: Colors.white),
-          ),
-          body: Center(
-            child: InteractiveViewer(child: Image.memory(bytes as Uint8List)),
-          ),
-        ),
-      ),
+    context.pushNamed(
+      Routes.mediaPreview,
+      arguments: bytes is Uint8List ? bytes : Uint8List.fromList(bytes),
     );
   }
 

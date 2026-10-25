@@ -233,11 +233,11 @@ class InspectorSettingsPage extends StatelessWidget {
         content: const Text(AppStrings.clearLogsMessage),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context, false),
+            onPressed: () => context.pop(false),
             child: const Text(AppStrings.cancel),
           ),
           FilledButton(
-            onPressed: () => Navigator.pop(context, true),
+            onPressed: () => context.pop(true),
             style: FilledButton.styleFrom(
               backgroundColor: Theme.of(context).colorScheme.error,
             ),
@@ -249,12 +249,7 @@ class InspectorSettingsPage extends StatelessWidget {
     if (ok == true) {
       await ChuckerFlutterPlus.clearLogs();
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(AppStrings.allLogsCleared),
-            duration: Duration(seconds: 2),
-          ),
-        );
+        context.successSnackBar(AppStrings.allLogsCleared);
       }
     }
   }

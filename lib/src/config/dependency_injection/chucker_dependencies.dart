@@ -3,7 +3,6 @@ import '../../features/network_inspector/data/repositories/network_transaction_r
 import '../../features/network_inspector/domain/repositories/network_transaction_repository.dart';
 import '../../features/network_inspector/domain/usecases/record_network_transaction.dart';
 
-/// Composition root for the network-inspector feature.
 class ChuckerDependencies {
   ChuckerDependencies({
     required this.transactions,

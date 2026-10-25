@@ -5,10 +5,10 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 
 import '../../../config/dependency_injection/chucker_dependencies.dart';
+import '../../../core/routes/routes.dart';
 import '../domain/entities/network_transaction.dart';
 import '../infrastructure/body_capture.dart';
 import '../infrastructure/notifications/chucker_notification_service.dart';
-import 'pages/network_inspector_page.dart';
 import 'inspector_settings.dart';
 import 'inspector_config.dart';
 import 'request_banner.dart';
@@ -24,6 +24,7 @@ class ChuckerFlutterPlus {
     'set-cookie',
   };
   static ChuckerDependencies _dependencies = ChuckerDependencies.create();
+  static ChuckerDependencies get dependencies => _dependencies;
   static OverlayEntry? _entry;
   static ChuckerNotificationService? _notifications;
   static final settings = InspectorSettingsStore();
@@ -285,15 +286,11 @@ class _IsolatedInspectorState extends State<_IsolatedInspector> {
         color: theme.scaffoldBackgroundColor,
         child: SafeArea(
           child: Navigator(
-            onGenerateRoute: (_) => MaterialPageRoute<void>(
-              builder: (_) => Theme(
-                data: theme,
-                child: NetworkInspectorPage(
-                  dependencies: widget.dependencies,
-                  initiallySelectedId: widget.requestId,
-                  onClose: ChuckerFlutterPlus.hideInspector,
-                ),
-              ),
+            onGenerateRoute: (routeSettings) => AppRoutes.onGenerateRoute(
+              routeSettings,
+              dependencies: widget.dependencies,
+              initialRequestId: widget.requestId,
+              onClose: ChuckerFlutterPlus.hideInspector,
             ),
           ),
         ),

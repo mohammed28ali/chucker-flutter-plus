@@ -10,8 +10,6 @@ import '../widgets/empty_state.dart';
 import '../widgets/method_chip.dart';
 import '../widgets/status_badge.dart';
 import '../widgets/summary_header.dart';
-import 'request_detail_page.dart';
-import 'settings_page.dart';
 
 // ── Sort options ────────────────────────────────────────────────────────────
 
@@ -69,11 +67,11 @@ class _NetworkInspectorPageState extends State<NetworkInspectorPage> {
         content: const Text(AppStrings.clearLogsMessage),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context, false),
+            onPressed: () => context.pop(false),
             child: const Text(AppStrings.cancel),
           ),
           FilledButton(
-            onPressed: () => Navigator.pop(context, true),
+            onPressed: () => context.pop(true),
             style: FilledButton.styleFrom(
               backgroundColor: Theme.of(context).colorScheme.error,
             ),
@@ -118,21 +116,7 @@ class _NetworkInspectorPageState extends State<NetworkInspectorPage> {
   }
 
   void _openDetail(BuildContext context, NetworkTransaction t) {
-    Navigator.of(context).push(
-      PageRouteBuilder(
-        pageBuilder: (context, animation, secondaryAnimation) =>
-            RequestDetailPage(transaction: t),
-        transitionsBuilder: (context, anim, secondaryAnim, child) =>
-            SlideTransition(
-          position: Tween<Offset>(begin: const Offset(1, 0), end: Offset.zero)
-              .animate(
-                CurvedAnimation(parent: anim, curve: Curves.easeInOutCubic),
-              ),
-          child: child,
-        ),
-        transitionDuration: const Duration(milliseconds: 250),
-      ),
-    );
+    context.pushNamed(Routes.requestDetail, arguments: t);
   }
 
   @override
@@ -274,9 +258,7 @@ class _NetworkInspectorPageState extends State<NetworkInspectorPage> {
         ],
         onSelected: (v) async {
           if (v == 'settings') {
-            Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => const InspectorSettingsPage()),
-            );
+            context.pushNamed(Routes.settings);
           } else if (v == 'export') {
             final json = await ChuckerFlutterPlus.exportLogs();
             await SharePlus.instance.share(ShareParams(text: json));

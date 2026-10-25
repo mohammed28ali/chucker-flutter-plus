@@ -15,6 +15,7 @@ dependencies:
   hive_ce_flutter: ^2.3.0
   http: ^1.6.0
   share_plus: ^13.3.1
+  fluttertoast: ^10.0.2
 
 dev_dependencies:
   flutter_test:

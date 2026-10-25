@@ -92,12 +92,7 @@ class KeyValueRow extends StatelessWidget {
   }
 
   void _showCopied(BuildContext context) {
-    ScaffoldMessenger.maybeOf(context)?.showSnackBar(
-      const SnackBar(
-        content: Text(AppStrings.copiedToClipboard),
-        duration: Duration(milliseconds: 1500),
-      ),
-    );
+    context.successSnackBar(AppStrings.copiedToClipboard);
   }
 }
 
