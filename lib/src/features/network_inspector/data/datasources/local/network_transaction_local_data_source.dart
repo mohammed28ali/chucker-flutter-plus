@@ -1,11 +1,12 @@
 import 'dart:convert';
 import 'dart:typed_data';
+
 import 'package:hive_ce/hive.dart';
 import 'package:hive_ce_flutter/hive_flutter.dart';
+
 import '../../models/network_transaction_model.dart';
 import 'chucker_hive.dart';
 
-/// Package-owned lazy Hive box. It never closes or clears global Hive state.
 class NetworkTransactionLocalDataSource {
   NetworkTransactionLocalDataSource({
     this.typeId = 30001,
