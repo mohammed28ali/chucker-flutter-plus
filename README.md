@@ -39,6 +39,46 @@ For `package:http`, wrap the client instead:
 final client = ChuckerHttpClient(http.Client());
 ```
 
+## Shared console network logger
+
+`NetworkLogger` is a client-independent console logger that can be shared by
+Dio, Chopper, and `package:http`. It is separate from the transaction capture
+used by the inspector. The package includes Chopper 8 integration support.
+For narrower imports, use `network_logger.dart` for the core, or
+`network_logger_dio.dart`, `network_logger_chopper.dart`, and
+`network_logger_http.dart` for an individual adapter.
+
+```dart
+final logger = NetworkLogger(
+  config: const NetworkLogConfig(
+    logRequestHeaders: true,
+    logRequestBody: true,
+    logResponseBody: true,
+    logErrorBody: true,
+    logCurlCommand: true,
+    maxBodyLength: 4000,
+    slowRequestThreshold: Duration(seconds: 10),
+  ),
+);
+
+dio.interceptors.add(DioNetworkLoggerInterceptor(logger: logger));
+final chopper = ChopperClient(
+  interceptors: [ChopperNetworkLoggerInterceptor(logger: logger)],
+);
+final httpClient = LoggingHttpClient(inner: http.Client(), logger: logger);
+```
+
+The logger masks common credential headers and sensitive JSON keys by default.
+Pass custom sets through `NetworkLogConfig.sensitiveHeaders` and
+`sensitiveJsonKeys`, or inject a `LogRedactor`. Set `forceLogging: true` to log
+in release builds. A custom `NetworkLogPrinter` can route output to a logging
+framework. Dio requests can be excluded with
+`options.extra['network_logger.disabled'] = true`; for Chopper, use the
+`ChopperNetworkLoggerInterceptor.disableRequestTag` request tag. The HTTP wrapper logs only bodies that
+are available without consuming a request stream; it tees response streams and
+prints the response after the consumer finishes reading them. For per-request
+HTTP filtering, provide `shouldLog: (request) => ...` to `LoggingHttpClient`.
+
 Open the inspector from any debug UI location:
 
 ```dart

@@ -10,6 +10,7 @@ import 'inspector_settings.dart';
 
 class RequestBannerController {
   OverlayState? _overlay;
+  OverlayState? _entryOverlay;
   BuildContext? _context;
   OverlayEntry? _entry;
   Timer? _timer;
@@ -19,6 +20,14 @@ class RequestBannerController {
   void bind(BuildContext context) {
     _context = context;
     _overlay = Overlay.maybeOf(context, rootOverlay: true);
+    // A navigator can replace its Overlay while the banner is visible. Move
+    // the entry to the new Overlay so later requests still reach the screen.
+    final entry = _entry;
+    if (entry != null && _overlay != null && _entryOverlay != _overlay) {
+      entry.remove();
+      _overlay!.insert(entry);
+      _entryOverlay = _overlay;
+    }
   }
 
   void show(
@@ -29,6 +38,7 @@ class RequestBannerController {
     if (_overlay == null) return;
     if (_entry != null) {
       _pending++;
+      _entry!.markNeedsBuild();
       return;
     }
     _entry = OverlayEntry(
@@ -41,6 +51,7 @@ class RequestBannerController {
       ),
     );
     _overlay!.insert(_entry!);
+    _entryOverlay = _overlay;
     _timer = Timer(settings.bannerDuration, dismiss);
   }
 
@@ -48,6 +59,7 @@ class RequestBannerController {
     _timer?.cancel();
     _entry?.remove();
     _entry = null;
+    _entryOverlay = null;
     _pending = 0;
   }
 }
