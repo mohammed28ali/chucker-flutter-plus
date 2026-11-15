@@ -29,3 +29,8 @@ migrate_working_dir/
 .flutter-plugins-dependencies
 /build/
 /coverage/
+
+# Example app Flutter tooling
+/example/.dart_tool/
+/example/build/
+/example/.flutter-plugins-dependencies
