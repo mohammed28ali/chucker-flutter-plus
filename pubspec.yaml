@@ -16,7 +16,11 @@ environment:
   flutter: ">=1.17.0"
 
 dependencies:
+<<<<<<< Updated upstream
   dio: ^5.11.1
+=======
+  dio: ^5.9.0
+>>>>>>> Stashed changes
   chopper: ^8.7.0
   flutter:
     sdk: flutter

@@ -1,4 +1,9 @@
+<<<<<<< Updated upstream
 import 'package:chucker_flutter_plus/src/config/theme/inspector_theme.dart';
+=======
+import 'dart:async';
+
+>>>>>>> Stashed changes
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -29,11 +34,17 @@ class ChuckerFlutterPlus {
       _ChuckerNavigatorObserver();
 
   static ChuckerDependencies _dependencies = ChuckerDependencies.create();
+<<<<<<< Updated upstream
   static ChuckerDependencies get dependencies => _dependencies;
   static OverlayEntry? _entry;
   static ChuckerNotificationService? _notifications;
   static final settings = InspectorSettingsStore();
   static final _banner = RequestBannerController();
+=======
+  static OverlayEntry? _notificationEntry;
+  static Timer? _notificationTimer;
+
+>>>>>>> Stashed changes
   static bool get isEnabled => kDebugMode || showOnRelease;
 
   static NotificationDelivery notificationDelivery({
@@ -200,6 +211,7 @@ class ChuckerFlutterPlus {
     }
   }
 
+<<<<<<< Updated upstream
   static Future<void> clearLogs() => _dependencies.transactions.clear();
   static Future<String> exportLogs() async => jsonEncode(
     (await _dependencies.transactions.getAll())
@@ -315,6 +327,104 @@ class _IsolatedInspectorState extends State<_IsolatedInspector> {
               dependencies: widget.dependencies,
               initialRequestId: widget.requestId,
               onClose: ChuckerFlutterPlus.hideInspector,
+=======
+  static void _showStatus(NetworkTransaction transaction) {
+    final overlay = navigatorKey.currentState?.overlay;
+    if (overlay == null) return;
+
+    _notificationTimer?.cancel();
+    _notificationEntry?.remove();
+    final entry = OverlayEntry(
+      builder: (_) => _TransactionNotification(
+        transaction: transaction,
+        onDetails: () {
+          _dismissNotification();
+          showChuckerScreen();
+        },
+        onDismiss: _dismissNotification,
+      ),
+    );
+    _notificationEntry = entry;
+    overlay.insert(entry);
+    _notificationTimer = Timer(
+      const Duration(seconds: 5),
+      _dismissNotification,
+    );
+  }
+
+  static void _dismissNotification() {
+    _notificationTimer?.cancel();
+    _notificationTimer = null;
+    _notificationEntry?.remove();
+    _notificationEntry = null;
+  }
+}
+
+class _TransactionNotification extends StatelessWidget {
+  const _TransactionNotification({
+    required this.transaction,
+    required this.onDetails,
+    required this.onDismiss,
+  });
+
+  final NetworkTransaction transaction;
+  final VoidCallback onDetails;
+  final VoidCallback onDismiss;
+
+  @override
+  Widget build(BuildContext context) {
+    final succeeded = transaction.succeeded;
+    final status = transaction.statusCode?.toString() ?? 'Error';
+    final uri = transaction.uri.toString();
+    return Positioned(
+      top: 0,
+      left: 0,
+      right: 0,
+      child: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(12, 8, 12, 0),
+          child: Material(
+            elevation: 8,
+            color: Theme.of(context).colorScheme.surface,
+            borderRadius: BorderRadius.circular(12),
+            clipBehavior: Clip.antiAlias,
+            child: Row(
+              children: [
+                const SizedBox(width: 14),
+                Icon(
+                  succeeded ? Icons.check_circle : Icons.error,
+                  color: succeeded ? Colors.green : Colors.red,
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          '${transaction.method}  $status',
+                          style: Theme.of(context).textTheme.titleSmall,
+                        ),
+                        Text(
+                          uri,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                TextButton(onPressed: onDetails, child: const Text('Details')),
+                IconButton(
+                  tooltip: 'Dismiss',
+                  onPressed: onDismiss,
+                  icon: const Icon(Icons.close, size: 18),
+                ),
+              ],
+>>>>>>> Stashed changes
             ),
           ),
         ),

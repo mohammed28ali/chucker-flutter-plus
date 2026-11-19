@@ -1,9 +1,15 @@
 # chucker_flutter_plus
 
+<<<<<<< Updated upstream
 `chucker_flutter_plus` captures HTTP traffic from Dio and `package:http`, keeps
 a bounded local history, and opens an in-app screen where you can inspect
 requests and responses. It also includes an optional console `NetworkLogger`
 that can be shared by Dio, Chopper, and `package:http`.
+=======
+An in-app HTTP inspector and client-independent network logger for Flutter. It
+captures requests from Dio, Chopper, or `package:http`, prints sanitized logs,
+and can retain transactions for inspection in the app.
+>>>>>>> Stashed changes
 
 ## Install
 
@@ -20,14 +26,48 @@ dependencies:
   chucker_flutter_plus: ^0.1.0
 ```
 
+<<<<<<< Updated upstream
 ## Capture traffic and open the inspector
 
 Initialize Chucker once before `runApp`, then add the adapter for each client
 whose traffic you want to capture. Chucker uses your app's existing navigator;
 it does not replace your router or navigator key.
+=======
+Then run `flutter pub get`.
+
+## Shared network logger
+
+Create one logger and pass it to every client adapter. `NetworkLogger` and its
+models are client-independent and are available from
+`package:chucker_flutter_plus/network_logger.dart`.
+>>>>>>> Stashed changes
 
 ```dart
-import 'package:chucker_flutter_plus/chucker_flutter_plus.dart';
+import 'package:chucker_flutter_plus/network_logger.dart';
+
+final networkLogger = NetworkLogger(
+  config: const NetworkLogConfig(
+    logRequestHeaders: true,
+    logRequestBody: true,
+    logResponseHeaders: true,
+    logResponseBody: true,
+    logErrorBody: true,
+    logCurlCommand: true,
+    maxBodyLength: 4000,
+    slowRequestThreshold: Duration(seconds: 10),
+  ),
+  printer: (line) => debugPrint(line),
+);
+```
+
+Logging is enabled in debug builds by default. Set `enabled: true` to opt in
+elsewhere, or set `forceLogging: true` to force logs even when `enabled` is
+false. Review captured traffic carefully before enabling logs in production.
+
+### Dio
+
+```dart
+import 'package:chucker_flutter_plus/dio_network_logger.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
@@ -52,9 +92,88 @@ class MyApp extends StatelessWidget {
   );
 }
 
+final dio = Dio()
+  ..interceptors.add(DioNetworkLoggerInterceptor(logger: networkLogger));
+```
+
+### Chopper
+
+```dart
+import 'package:chucker_flutter_plus/chopper_network_logger.dart';
+import 'package:chopper/chopper.dart';
+
+final chopper = ChopperClient(
+  interceptors: [ChopperNetworkLoggerInterceptor(logger: networkLogger)],
+);
+```
+
+### `package:http`
+
+```dart
+import 'package:chucker_flutter_plus/http_network_logger.dart';
+import 'package:http/http.dart' as http;
+
+final httpClient = LoggingHttpClient(
+  inner: http.Client(),
+  logger: networkLogger,
+);
+```
+
+The HTTP adapter tees response bytes as the application reads them, preserving
+the response stream. It retains at most four times `maxBodyLength` bytes for
+diagnostic output. It logs a request body when the request is an `http.Request`;
+it does not consume a `StreamedRequest` body to inspect it.
+
+## Configuration, redaction, and request control
+
+`NetworkLogConfig` controls request, response, and error logging, request and
+response headers and bodies, cURL generation, truncation, slow-call threshold,
+ANSI colors, and sensitive header/body keys. Authorization, cookie, API key,
+password, and token fields are redacted by default. Provide a `LogRedactor` to
+customize sensitive keys:
+
+```dart
+final logger = NetworkLogger(
+  config: const NetworkLogConfig(enabled: true),
+  redactor: const LogRedactor(
+    sensitiveHeaders: {'authorization', 'x-session-id'},
+    sensitiveJsonKeys: {'password', 'access_token', 'private_note'},
+  ),
+  printer: (message) => myLogger.info(message),
+);
+```
+
+Use the following markers to omit an individual request from logs:
+
+```dart
+// Dio
+dio.get('/private', options: Options(extra: {
+  DioNetworkLoggerInterceptor.disableLoggingExtraKey: true,
+}));
+
+// Chopper
+final privateRequest = chopper.Request(
+  'GET', Uri.parse('/private'), Uri.parse('https://api.example.com'),
+  tag: const NetworkLoggerDisabled(),
+);
+
+// HTTP: this control header is stripped before the request is sent.
+final request = http.Request('GET', uri)
+  ..headers[LoggingHttpClient.disableLoggingHeader] = 'true';
+```
+
+Logging and printer exceptions are contained by the logger so they do not
+change the network client's result.
+
+## In-app inspector and notifications
+
+Attach the navigator key to the host app and install an inspector adapter:
+
+```dart
 final dio = Dio()..interceptors.add(ChuckerDioInterceptor());
 ```
 
+<<<<<<< Updated upstream
 If your app already uses a navigator key, pass it to `initialize` and keep
 using it in your app:
 
@@ -247,3 +366,27 @@ dart format .
 flutter analyze
 flutter test
 ```
+=======
+Captured requests show an in-app notification with method, status or error, and
+URL. **Details** opens the transaction inspector. Set
+`ChuckerFlutterPlus.showNotification = false` to suppress the banner. Open the
+inspector manually with `ChuckerFlutterPlus.button()` or
+`ChuckerFlutterPlus.showChuckerScreen()`.
+
+The capture adapters (`ChuckerDioInterceptor` and `ChuckerHttpClient`) persist
+transactions for the inspector. The `DioNetworkLoggerInterceptor`,
+`ChopperNetworkLoggerInterceptor`, and `LoggingHttpClient` adapters print
+sanitized diagnostics. You can use both features together.
+
+Capture is enabled only in debug builds by default. Call
+`ChuckerFlutterPlus.configure(enableOnRelease: true)` to capture in release
+builds; sanitize or redact sensitive traffic before enabling it.
+
+## Public entry points
+
+- `network_logger.dart`: shared logger, configuration, models, and redactor.
+- `dio_network_logger.dart`: shared logger and Dio logging adapter.
+- `chopper_network_logger.dart`: shared logger and Chopper logging adapter.
+- `http_network_logger.dart`: shared logger and HTTP logging adapter.
+- `chucker_flutter_plus.dart`: inspector, capture adapters, and all logger APIs.
+>>>>>>> Stashed changes
